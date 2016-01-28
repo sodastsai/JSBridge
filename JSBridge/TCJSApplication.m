@@ -103,4 +103,8 @@
     return [UIDevice currentDevice].modelIdentifier;
 }
 
+- (void)_garbageCollect {
+    JSGarbageCollect([JSContext currentContext].JSGlobalContextRef);
+}
+
 @end

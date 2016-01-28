@@ -50,6 +50,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSString *model;
 
+#if DEBUG
+- (void)_garbageCollect;
+#endif
+
 @end
 
 @interface TCJSSystem : NSObject <TCJSSystem, TCJSJavaScriptContextExtension>
