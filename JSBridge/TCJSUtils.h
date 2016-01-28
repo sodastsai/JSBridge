@@ -1,5 +1,5 @@
 //
-//  TCJSBridge.h
+//  TCJSUtils.h
 //  JSBridge
 //
 //  Copyright 2016 Tien-Che Tsai, and Tickle Labs, Inc.
@@ -17,6 +17,12 @@
 //  limitations under the License.
 //
 
-#import <TCJSBridge/TCJSJavaScriptContext.h>
-#import <TCJSBridge/TCJSModule.h>
-#import <TCJSBridge/TCJSUtils.h>
+#import <Foundation/Foundation.h>
+#import <JavaScriptCore/JavaScriptCore.h>
+
+@interface TCJSUtil : NSObject
+
++ (NSString *)format;
++ (NSString *)inspect:(JSValue *)object;
+
+@end

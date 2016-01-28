@@ -14,6 +14,10 @@
 		FEB7EE4E1C59B1EC00B0D44E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FEB7EE4D1C59B1EC00B0D44E /* Assets.xcassets */; };
 		FEB7EE511C59B1EC00B0D44E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FEB7EE4F1C59B1EC00B0D44E /* LaunchScreen.storyboard */; };
 		FEB7EE7A1C59B7BD00B0D44E /* JSBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE791C59B7BD00B0D44E /* JSBridgeTests.swift */; };
+		FEB7EE901C59C0B400B0D44E /* RequireTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE8F1C59C0B400B0D44E /* RequireTests.swift */; };
+		FEB7EE921C59C16C00B0D44E /* RequireTests.js in Resources */ = {isa = PBXBuildFile; fileRef = FEB7EE911C59C16C00B0D44E /* RequireTests.js */; };
+		FEB7EE941C59C17500B0D44E /* RequireTests2.js in Resources */ = {isa = PBXBuildFile; fileRef = FEB7EE931C59C17500B0D44E /* RequireTests2.js */; };
+		FEB7EE971C59C35700B0D44E /* UtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE961C59C35700B0D44E /* UtilsTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +44,11 @@
 		FEB7EE771C59B7BD00B0D44E /* JSBridgeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JSBridgeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEB7EE791C59B7BD00B0D44E /* JSBridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSBridgeTests.swift; sourceTree = "<group>"; };
 		FEB7EE7B1C59B7BD00B0D44E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FEB7EE8B1C59C09100B0D44E /* JSBridgeTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "JSBridgeTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		FEB7EE8F1C59C0B400B0D44E /* RequireTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequireTests.swift; sourceTree = "<group>"; };
+		FEB7EE911C59C16C00B0D44E /* RequireTests.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = RequireTests.js; sourceTree = "<group>"; };
+		FEB7EE931C59C17500B0D44E /* RequireTests2.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = RequireTests2.js; sourceTree = "<group>"; };
+		FEB7EE961C59C35700B0D44E /* UtilsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UtilsTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,9 +124,22 @@
 			isa = PBXGroup;
 			children = (
 				FEB7EE791C59B7BD00B0D44E /* JSBridgeTests.swift */,
-				FEB7EE7B1C59B7BD00B0D44E /* Info.plist */,
+				FEB7EE8F1C59C0B400B0D44E /* RequireTests.swift */,
+				FEB7EE911C59C16C00B0D44E /* RequireTests.js */,
+				FEB7EE931C59C17500B0D44E /* RequireTests2.js */,
+				FEB7EE961C59C35700B0D44E /* UtilsTests.swift */,
+				FEB7EE951C59C34100B0D44E /* Supporting Files */,
 			);
 			path = JSBridgeTests;
+			sourceTree = "<group>";
+		};
+		FEB7EE951C59C34100B0D44E /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				FEB7EE7B1C59B7BD00B0D44E /* Info.plist */,
+				FEB7EE8B1C59C09100B0D44E /* JSBridgeTests-Bridging-Header.h */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -214,6 +236,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FEB7EE921C59C16C00B0D44E /* RequireTests.js in Resources */,
+				FEB7EE941C59C17500B0D44E /* RequireTests2.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,6 +306,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				FEB7EE7A1C59B7BD00B0D44E /* JSBridgeTests.swift in Sources */,
+				FEB7EE901C59C0B400B0D44E /* RequireTests.swift in Sources */,
+				FEB7EE971C59C35700B0D44E /* UtilsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -404,7 +430,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = JSBridgeApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jsbridge.JSBridgeApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -417,7 +443,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = JSBridgeApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jsbridge.JSBridgeApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -428,10 +454,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = JSBridgeTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jsbridge.JSBridgeTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "JSBridgeTests/JSBridgeTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/JSBridgeApp.app/JSBridgeApp";
 			};
 			name = Debug;
@@ -440,10 +469,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = JSBridgeTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jsbridge.JSBridgeTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "JSBridgeTests/JSBridgeTests-Bridging-Header.h";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/JSBridgeApp.app/JSBridgeApp";
 			};
 			name = Release;

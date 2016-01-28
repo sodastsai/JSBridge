@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		FEB7EE651C59B42800B0D44E /* TCJSBridge.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEB7EE641C59B42800B0D44E /* TCJSBridge.h */; };
+		FEB7EE831C59B95900B0D44E /* TCJSJavaScriptContext.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE821C59B95900B0D44E /* TCJSJavaScriptContext.m */; };
+		FEB7EE861C59BAC500B0D44E /* TCJSModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE851C59BAC500B0D44E /* TCJSModule.m */; };
+		FEB7EE891C59BE6B00B0D44E /* TCJSUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE881C59BE6B00B0D44E /* TCJSUtils.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,6 +29,13 @@
 /* Begin PBXFileReference section */
 		FEB7EE611C59B42800B0D44E /* libJSBridge.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libJSBridge.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEB7EE641C59B42800B0D44E /* TCJSBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TCJSBridge.h; sourceTree = "<group>"; };
+		FEB7EE811C59B95900B0D44E /* TCJSJavaScriptContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSJavaScriptContext.h; sourceTree = "<group>"; };
+		FEB7EE821C59B95900B0D44E /* TCJSJavaScriptContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSJavaScriptContext.m; sourceTree = "<group>"; };
+		FEB7EE841C59BAC500B0D44E /* TCJSModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSModule.h; sourceTree = "<group>"; };
+		FEB7EE851C59BAC500B0D44E /* TCJSModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSModule.m; sourceTree = "<group>"; };
+		FEB7EE871C59BE6B00B0D44E /* TCJSUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSUtils.h; sourceTree = "<group>"; };
+		FEB7EE881C59BE6B00B0D44E /* TCJSUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSUtils.m; sourceTree = "<group>"; };
+		FEB7EE8A1C59BF8B00B0D44E /* TCJSUtils.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = TCJSUtils.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +69,13 @@
 			isa = PBXGroup;
 			children = (
 				FEB7EE641C59B42800B0D44E /* TCJSBridge.h */,
+				FEB7EE811C59B95900B0D44E /* TCJSJavaScriptContext.h */,
+				FEB7EE821C59B95900B0D44E /* TCJSJavaScriptContext.m */,
+				FEB7EE841C59BAC500B0D44E /* TCJSModule.h */,
+				FEB7EE851C59BAC500B0D44E /* TCJSModule.m */,
+				FEB7EE871C59BE6B00B0D44E /* TCJSUtils.h */,
+				FEB7EE881C59BE6B00B0D44E /* TCJSUtils.m */,
+				FEB7EE8A1C59BF8B00B0D44E /* TCJSUtils.js */,
 			);
 			path = JSBridge;
 			sourceTree = "<group>";
@@ -89,7 +106,7 @@
 		FEB7EE591C59B42800B0D44E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				CLASSPREFIX = TCJ;
+				CLASSPREFIX = TCJS;
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = JSBridge;
 				TargetAttributes = {
@@ -120,6 +137,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FEB7EE891C59BE6B00B0D44E /* TCJSUtils.m in Sources */,
+				FEB7EE831C59B95900B0D44E /* TCJSJavaScriptContext.m in Sources */,
+				FEB7EE861C59BAC500B0D44E /* TCJSModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

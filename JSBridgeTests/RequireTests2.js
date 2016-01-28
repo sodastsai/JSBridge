@@ -1,7 +1,4 @@
 //
-//  TCJSBridge.h
-//  JSBridge
-//
 //  Copyright 2016 Tien-Che Tsai, and Tickle Labs, Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +14,6 @@
 //  limitations under the License.
 //
 
-#import <TCJSBridge/TCJSJavaScriptContext.h>
-#import <TCJSBridge/TCJSModule.h>
-#import <TCJSBridge/TCJSUtils.h>
+module.exports.squareAdd = function(a, b) {
+    return Math.pow(a, 2) + Math.pow(b, 2);
+};

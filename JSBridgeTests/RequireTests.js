@@ -1,7 +1,4 @@
 //
-//  TCJSBridge.h
-//  JSBridge
-//
 //  Copyright 2016 Tien-Che Tsai, and Tickle Labs, Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +14,15 @@
 //  limitations under the License.
 //
 
-#import <TCJSBridge/TCJSJavaScriptContext.h>
-#import <TCJSBridge/TCJSModule.h>
-#import <TCJSBridge/TCJSUtils.h>
+var tests2 = require('RequireTests2.js');
+
+module.exports.answer = 42;
+
+var garbage = 43;
+global.overrided = 44;
+
+exports.name = "Tickle";
+
+module.exports.twentyFive = tests2.squareAdd(3, 4);
+
+global.loadCount++;

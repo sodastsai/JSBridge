@@ -1,7 +1,4 @@
 //
-//  TCJSBridge.h
-//  JSBridge
-//
 //  Copyright 2016 Tien-Che Tsai, and Tickle Labs, Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +14,24 @@
 //  limitations under the License.
 //
 
-#import <TCJSBridge/TCJSJavaScriptContext.h>
-#import <TCJSBridge/TCJSModule.h>
-#import <TCJSBridge/TCJSUtils.h>
+'use strict';
+
+var objectToString = exports.objectToString = function(obj) {
+    return Object.prototype.toString.call(obj);
+}
+
+exports.isRegExp = function(obj) {
+    return objectToString(obj) === '[object RegExp]';
+};
+
+exports.isArray = function(obj) {
+    return objectToString(obj) === '[object Array]';
+};
+
+exports.isDate = function(obj) {
+    return objectToString(obj) === '[object Date]';
+};
+
+exports.isError = function(obj) {
+    return objectToString(obj) === '[object Error]';
+};
