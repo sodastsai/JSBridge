@@ -3,15 +3,21 @@ declare const root: any;  // Alias of root object
 
 
 // Module --------------------------------------------------------------------------------------------------------------
-declare const module: {
+interface RequireFunc {
+    (path: string): any;
+    resolve(path: string): string;
+}
+interface Module {
     // Current module object
-    filename: string;  // Readonly, file name of current script
+    filename: string;  // Readonly, file name of current script. Use this as __filename and __dirname in node.
     loaded: boolean;  // Readonly, indicating whether the script content is loaded of not
     exports: any;  // Exports symbols
     paths: [string];  // Readonly, search paths. The `require` function would find scripts under these paths
-    require(path: string): any;  // Import/Load other scripts in.
-};
-declare const require: (path: string) => any;  // Import/Load other scripts in.
+    require: RequireFunc;  // Import/Load other scripts in.
+    clearRequireCache();
+}g
+declare const module: Module;
+declare const require: RequireFunc;  // Import/Load other scripts in.
 
 
 // Application and System ----------------------------------------------------------------------------------------------

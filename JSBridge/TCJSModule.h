@@ -32,7 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readwrite) JSValue *exports;
 
 @property (nonatomic, strong, readonly) NSMutableArray<NSString *> *paths;
-- (nullable JSValue *)require:(NSString *)jsPath;
+@property (nonatomic, strong, readonly) JSValue *require;
+
+- (void)clearRequireCache;
 
 @end
 
@@ -47,7 +49,11 @@ NS_ASSUME_NONNULL_BEGIN
                                             loadPaths:(nullable NSArray<NSString *> *)loadPaths;
 - (instancetype)initWithScript:(nullable NSString *)script
                     sourceFile:(nullable NSString *)path
-                     loadPaths:(nullable NSArray<NSString *> *)loadPaths NS_DESIGNATED_INITIALIZER;
+                     loadPaths:(nullable NSArray<NSString *> *)loadPaths
+                       context:(nullable JSContext *)context NS_DESIGNATED_INITIALIZER;
+
+- (nullable NSString *)resolve:(NSString *)jsPath;
+- (nullable JSValue *)require:(NSString *)jsPath;
 
 @end
 

@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TCJSConsole : NSObject <TCJSConsole>
 
-@property (nonatomic, strong, nullable) id<TCJSOutputConsole> outputConsole;
+@property (nonatomic, weak, nullable) id<TCJSOutputConsole> outputConsole;
 
 @end
 

@@ -55,5 +55,25 @@ class RequireTests: JSBridgeTests {
         self.context.evaluateScript("var test2 = require('RequireTests.js');")
         XCTAssertEqual(globalObject.valueForProperty("loadCount").toNumber(), 1)
     }
-    
+
+    func testResolve() {
+        XCTAssertEqual(self.context.evaluateScript("require.resolve('RequireTests.js');").toString(),
+            self.bundle.pathForResource("RequireTests", ofType: "js"))
+        XCTAssertTrue(self.context.evaluateScript("require.resolve('11RequireTests.js');").isUndefined)
+    }
+
+    func testClearRequireCache() {
+        let globalObject = self.context.globalObject
+        globalObject.setValue(0, forProperty: "loadCount")
+        self.context.evaluateScript("var test = require('RequireTests.js');")
+        XCTAssertEqual(globalObject.valueForProperty("loadCount").toNumber(), 1)
+
+        self.context.evaluateScript("var test2 = require('RequireTests.js');")
+        XCTAssertEqual(globalObject.valueForProperty("loadCount").toNumber(), 1)
+
+        self.context.evaluateScript("module.clearRequireCache();")
+
+        self.context.evaluateScript("var test3 = require('RequireTests.js');")
+        XCTAssertEqual(globalObject.valueForProperty("loadCount").toNumber(), 2)
+    }
 }

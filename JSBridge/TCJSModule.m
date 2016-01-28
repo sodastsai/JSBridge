@@ -31,20 +31,19 @@
 
 @implementation TCJSModule
 
-@synthesize exports = _exports;
+@synthesize exports = _exports, require = _require;
 
 + (void)loadExtensionForJSContext:(JSContext *)context {
-    TCJSModule *module = [[TCJSModule alloc] initWithScript:nil
-                                                   sourceFile:nil
-                                                    loadPaths:@[[NSBundle mainBundle].bundlePath]];
+    TCJSModule *module = [[TCJSModule alloc]
+                          initWithScript:nil
+                          sourceFile:nil
+                          loadPaths:@[[NSBundle mainBundle].bundlePath,
+                                      [NSBundle bundleForClass:TCJSModule.class].bundlePath]
+                          context:context];
     module.filename = @".";
     module.loaded = YES;
-
     context[@"module"] = module;
-    JSValue *require = context[@"require"] = [JSValue valueWithObject:^JSValue *(NSString *path) {
-        return [module require:path];
-    } inContext:context];
-    require[@"main"] = module;
+    context[@"require"] = module.require;
 }
 
 + (NSMutableDictionary<NSString *, TCJSModule *(^)(void)> *)registeredGlobalModules {
@@ -90,19 +89,20 @@
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
         NSString *scriptContent = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
         if (scriptContent) {
-            return self = [self initWithScript:scriptContent sourceFile:path loadPaths:loadPaths];
+            return self = [self initWithScript:scriptContent sourceFile:path loadPaths:loadPaths context:nil];
         }
     }
     return self = nil;
 }
 
 - (instancetype)init {
-    return self = [self initWithScript:nil sourceFile:nil loadPaths:nil];
+    return self = [self initWithScript:nil sourceFile:nil loadPaths:nil context:nil];
 }
 
 - (instancetype)initWithScript:(NSString *)script
                     sourceFile:(NSString *)path
-                     loadPaths:(nullable NSArray<NSString *> *)loadPaths {
+                     loadPaths:(nullable NSArray<NSString *> *)loadPaths
+                       context:(nullable JSContext *)context {
     if (self = [super init]) {
         // Set load paths if necessary
         if (!loadPaths) {
@@ -111,7 +111,9 @@
                 loadPaths = mainModule.paths;
             }
         }
+        context = context ?: [JSContext currentContext];
         NSAssert(loadPaths, @"There's no global module ... loadPaths must be set");
+        NSAssert(context, @"Cann't find a JSContext");
 
         // Initialize
         _paths = [loadPaths mutableCopy];
@@ -119,6 +121,17 @@
         _loaded = NO;
         _filename = path;
         _moduleID = [NSString randomStringByLength:32];
+
+        // Require Function
+        @weakify(self);
+        _require = [JSValue valueWithObject:^JSValue *_Nullable(NSString *path) {
+            @strongify(self);
+            return [self require:path];
+        } inContext:context];
+        _require[@"resolve"] = [JSValue valueWithObject:^NSString *_Nullable(NSString *path) {
+            @strongify(self);
+            return [self resolve:path];
+        } inContext:context];
 
         // Load script
         if (path) {
@@ -136,10 +149,9 @@
                                           @"})();", script];
                 JSValue *loaderFunc;
                 if (path) {
-                    loaderFunc = [[JSContext currentContext] evaluateScript:paddedScript
-                                                              withSourceURL:[NSURL fileURLWithPath:path]];
+                    loaderFunc = [context evaluateScript:paddedScript withSourceURL:[NSURL fileURLWithPath:path]];
                 } else {
-                    loaderFunc = [[JSContext currentContext] evaluateScript:paddedScript];
+                    loaderFunc = [context evaluateScript:paddedScript];
                 }
                 [loaderFunc callWithArguments:@[
                     self,
@@ -183,22 +195,28 @@
     return requiredCache;
 }
 
+- (void)clearRequireCache {
+    [self.requireCache removeAllObjects];
+}
+
+- (nullable NSString *)resolve:(NSString *)jsPath {
+    NSString *fullJSPath = nil;
+    for (NSString *path in self.paths) {
+        fullJSPath = [path stringByAppendingPathComponent:jsPath].stringByStandardizingPath;
+        if ([fullJSPath isSubpathOfPath:path] &&
+            [[NSFileManager defaultManager] fileExistsAtPath:fullJSPath]) {
+            return fullJSPath;
+        }
+    }
+    return nil;
+}
+
 - (nullable JSValue *)require:(NSString *)jsPath {
     JSContext *currentContext = [JSContext currentContext];
     TCJSModule *module = [self.requireCache objectForKey:jsPath];
     if (!module) {
         if ([jsPath hasSuffix:@".js"]) {
-            // Find file
-            NSString *fullJSPath = nil;
-            for (NSString *path in self.paths) {
-                fullJSPath = [path stringByAppendingPathComponent:jsPath].stringByStandardizingPath;
-                if ([fullJSPath isSubpathOfPath:path] &&
-                    [[NSFileManager defaultManager] fileExistsAtPath:fullJSPath]) {
-                    break;
-                } else {
-                    fullJSPath = nil;
-                }
-            }
+            NSString *fullJSPath = [self resolve:jsPath];
             if (fullJSPath) {
                 module = [[TCJSModule alloc] initWithScriptContentsOfFile:fullJSPath loadPaths:self.paths];
             }
