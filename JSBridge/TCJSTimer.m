@@ -46,7 +46,7 @@
         NSArray *arguments = [[JSContext currentArguments] subarrayFromIndex:2];
         TCJSTimer *timer = [[TCJSTimer alloc] initWithCallback:callback
                                                      arguments:arguments
-                                                       timeout:timeout/1000
+                                                       timeout:timeout/1000.
                                                         repeat:NO];
         [timer start];
         return timer;
@@ -55,7 +55,7 @@
         NSArray *arguments = [[JSContext currentArguments] subarrayFromIndex:2];
         TCJSTimer *timer = [[TCJSTimer alloc] initWithCallback:callback
                                                      arguments:arguments
-                                                       timeout:timeout/1000
+                                                       timeout:timeout/1000.
                                                         repeat:YES];
         [timer start];
         return timer;

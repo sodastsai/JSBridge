@@ -31,6 +31,7 @@ class JSBridgeTests: XCTestCase {
     override func setUp() {
         super.setUp()
         self.context = TCJSJavaScriptContextCreateContext()
+        self.context.name = "JSBridge UnitTest for \(self.name)"
     }
 
     override func tearDown() {

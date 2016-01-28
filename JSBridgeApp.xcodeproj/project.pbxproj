@@ -20,6 +20,7 @@
 		FEB7EE971C59C35700B0D44E /* UtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE961C59C35700B0D44E /* UtilsTests.swift */; };
 		FEB7EEA11C59C96C00B0D44E /* ConsoleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEA01C59C96C00B0D44E /* ConsoleTests.swift */; };
 		FEB7EEA31C59C9EA00B0D44E /* ApplicationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEA21C59C9EA00B0D44E /* ApplicationTests.swift */; };
+		FEB7EEAE1C5A03DD00B0D44E /* TimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEAD1C5A03DD00B0D44E /* TimerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,7 @@
 		FEB7EE961C59C35700B0D44E /* UtilsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UtilsTests.swift; sourceTree = "<group>"; };
 		FEB7EEA01C59C96C00B0D44E /* ConsoleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleTests.swift; sourceTree = "<group>"; };
 		FEB7EEA21C59C9EA00B0D44E /* ApplicationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationTests.swift; sourceTree = "<group>"; };
+		FEB7EEAD1C5A03DD00B0D44E /* TimerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,6 +136,7 @@
 				FEB7EE961C59C35700B0D44E /* UtilsTests.swift */,
 				FEB7EEA01C59C96C00B0D44E /* ConsoleTests.swift */,
 				FEB7EEA21C59C9EA00B0D44E /* ApplicationTests.swift */,
+				FEB7EEAD1C5A03DD00B0D44E /* TimerTests.swift */,
 				FEB7EE951C59C34100B0D44E /* Supporting Files */,
 			);
 			path = JSBridgeTests;
@@ -316,6 +319,7 @@
 				FEB7EEA31C59C9EA00B0D44E /* ApplicationTests.swift in Sources */,
 				FEB7EE971C59C35700B0D44E /* UtilsTests.swift in Sources */,
 				FEB7EEA11C59C96C00B0D44E /* ConsoleTests.swift in Sources */,
+				FEB7EEAE1C5A03DD00B0D44E /* TimerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
