@@ -51,9 +51,19 @@
         [timer start];
         return timer;
     };
-    globalObject[@"clearTimeout"] = ^(TCJSTimer *timer) {
+    globalObject[@"setInterval"] = ^TCJSTimer *(JSValue *callback, long timeout) {
+        NSArray *arguments = [[JSContext currentArguments] subarrayFromIndex:2];
+        TCJSTimer *timer = [[TCJSTimer alloc] initWithCallback:callback
+                                                     arguments:arguments
+                                                       timeout:timeout/1000
+                                                        repeat:YES];
+        [timer start];
+        return timer;
+    };
+    globalObject[@"clearInterval"] = globalObject[@"clearTimeout"] = ^(TCJSTimer *timer) {
         [timer stop];
     };
+
 }
 
 - (instancetype)initWithCallback:(JSValue *)callback
