@@ -141,19 +141,23 @@
             @autoreleasepool {
                 NSString *paddedScript = [NSString stringWithFormat:
                                           @"(function() {\n"
-                                          @"    return function(module, exports, require) {\n"
-                                          @"        /* --- Start of Script --- */\n"
+                                          @"    function _scriptLoader(module, exports, require) {\n"
+                                          @"        function _scriptBody(module, exports, require) {\n"
+                                          @"            /* --- Start of Script Body --- */\n"
                                           @"%@\n"
-                                          @"        /* --- End of Script Content --- */\n"
-                                          @"    };\n"
+                                          @"            /* --- End of Script Body --- */\n"
+                                          @"        }\n"
+                                          @"        _scriptBody.apply(exports, arguments);\n"
+                                          @"    }\n"
+                                          @"    return _scriptLoader;\n"
                                           @"})();", script];
-                JSValue *loaderFunc;
+                JSValue *scriptLoader;
                 if (path) {
-                    loaderFunc = [context evaluateScript:paddedScript withSourceURL:[NSURL fileURLWithPath:path]];
+                    scriptLoader = [context evaluateScript:paddedScript withSourceURL:[NSURL fileURLWithPath:path]];
                 } else {
-                    loaderFunc = [context evaluateScript:paddedScript];
+                    scriptLoader = [context evaluateScript:paddedScript];
                 }
-                [loaderFunc callWithArguments:@[
+                [scriptLoader callWithArguments:@[
                     self,
                     self.exports,
                     ^JSValue *(NSString *path){ return [self require:path]; },
