@@ -1,0 +1,58 @@
+PODS:
+  - BenzeneFoundation/Foundation (0.5.40):
+    - libextobjc (~> 0.4)
+  - BenzeneFoundation/UIKit (0.5.40):
+    - BenzeneFoundation/Foundation
+    - libextobjc (~> 0.4)
+  - libextobjc (0.4.1):
+    - libextobjc/EXTADT (= 0.4.1)
+    - libextobjc/EXTConcreteProtocol (= 0.4.1)
+    - libextobjc/EXTKeyPathCoding (= 0.4.1)
+    - libextobjc/EXTNil (= 0.4.1)
+    - libextobjc/EXTSafeCategory (= 0.4.1)
+    - libextobjc/EXTScope (= 0.4.1)
+    - libextobjc/EXTSelectorChecking (= 0.4.1)
+    - libextobjc/EXTSynthesize (= 0.4.1)
+    - libextobjc/NSInvocation+EXT (= 0.4.1)
+    - libextobjc/NSMethodSignature+EXT (= 0.4.1)
+    - libextobjc/RuntimeExtensions (= 0.4.1)
+    - libextobjc/UmbrellaHeader (= 0.4.1)
+  - libextobjc/EXTADT (0.4.1):
+    - libextobjc/RuntimeExtensions
+  - libextobjc/EXTConcreteProtocol (0.4.1):
+    - libextobjc/RuntimeExtensions
+  - libextobjc/EXTKeyPathCoding (0.4.1):
+    - libextobjc/RuntimeExtensions
+  - libextobjc/EXTNil (0.4.1):
+    - libextobjc/RuntimeExtensions
+  - libextobjc/EXTSafeCategory (0.4.1):
+    - libextobjc/RuntimeExtensions
+  - libextobjc/EXTScope (0.4.1):
+    - libextobjc/RuntimeExtensions
+  - libextobjc/EXTSelectorChecking (0.4.1):
+    - libextobjc/RuntimeExtensions
+  - libextobjc/EXTSynthesize (0.4.1):
+    - libextobjc/RuntimeExtensions
+  - libextobjc/NSInvocation+EXT (0.4.1):
+    - libextobjc/RuntimeExtensions
+  - libextobjc/NSMethodSignature+EXT (0.4.1):
+    - libextobjc/RuntimeExtensions
+  - libextobjc/RuntimeExtensions (0.4.1)
+  - libextobjc/UmbrellaHeader (0.4.1)
+  - TCJSBridge (0.0.1):
+    - BenzeneFoundation/UIKit (~> 0.5.40)
+    - libextobjc
+
+DEPENDENCIES:
+  - TCJSBridge (from `.`)
+
+EXTERNAL SOURCES:
+  TCJSBridge:
+    :path: "."
+
+SPEC CHECKSUMS:
+  BenzeneFoundation: 30828f796de9770e0c87e525cb20bed32ce50e4f
+  libextobjc: a650fc1bf489a3d3a9bc2e621efa3e1006fc5471
+  TCJSBridge: 6724ee29676763545fe821a319a52f3376775593
+
+COCOAPODS: 0.39.0
