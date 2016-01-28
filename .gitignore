@@ -1,0 +1,47 @@
+# OS X
+.DS_Store
+*~
+
+# Xcode / Objective-C / Swift
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+*.xcscmblueprint
+profile
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.dSYM.zip
+*.o
+*.LinkFileList
+*~.nib/
+*.swp
+*~
+*.dat
+*.dep
+
+# CocoaPods / Carthage
+Pods
+Carthage/Build
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/screenshots/screenshots.html
+fastlane/test_output
+fastlane/codesign
+
+# node.js
+node_modules
