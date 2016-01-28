@@ -150,7 +150,7 @@
                                           @"        _scriptBody.apply(exports, arguments);\n"
                                           @"    }\n"
                                           @"    return _scriptLoader;\n"
-                                          @"})();", script];
+                                          @"})();\n", script];
                 JSValue *scriptLoader;
                 if (path) {
                     scriptLoader = [context evaluateScript:paddedScript withSourceURL:[NSURL fileURLWithPath:path]];
