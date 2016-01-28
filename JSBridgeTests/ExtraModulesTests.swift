@@ -1,6 +1,6 @@
 //
-//  TCJSExtraModules.m
-//  JSBridge
+//  ExtraModulesTests.swift
+//  JSBridgeApp
 //
 //  Copyright 2016 Tien-Che Tsai, and Tickle Labs, Inc.
 //
@@ -17,21 +17,17 @@
 //  limitations under the License.
 //
 
-#import <Foundation/Foundation.h>
-#import "TCJSModule.h"
+import XCTest
 
-@interface TCJSExtraModules : NSObject
+class ExtraModulesTests: JSBridgeTests {
 
-@end
-
-@implementation TCJSExtraModules
-
-+ (void)load {
-    [TCJSModule registerGlobalModuleNamed:@"underscore" withBlock:^TCJSModule * _Nonnull{
-        NSString *underscorePath = [[NSBundle bundleForClass:TCJSExtraModules.class]
-                                    pathForResource:@"TCJS_underscore_1.8.3" ofType:@"js"];
-        return [[TCJSModule alloc] initWithScriptContentsOfFile:underscorePath];
-    }];
+    func testUnderscore() {
+        let inputArray = [1, 2, 3]
+        self.context.evaluateScript("var _ = require('underscore');")
+        self.context.globalObject.setValue(inputArray, forProperty: "inputArray")
+        self.context.evaluateScript("var outputArray = _.map(inputArray, function(i) { return i*i; });")
+        let outputArray = self.context.globalObject.valueForProperty("outputArray").toArray() as! [Int]
+        XCTAssertEqual(inputArray.map { $0*$0 }, outputArray)
+    }
+    
 }
-
-@end
