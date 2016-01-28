@@ -19,6 +19,13 @@ interface Module {
 declare const module: Module;
 declare const require: RequireFunc;  // Import/Load other scripts in.
 
+/* Global Modules
+ *
+ * * `util`: see `Util`.
+ * * `fs`: see `FS`.
+ * * `underscore`: Check underscore.js 1.8.3 (External, from http://underscorejs.org)
+ */
+
 
 // Application and System ----------------------------------------------------------------------------------------------
 declare const application: {
@@ -72,5 +79,7 @@ interface Util {
 
 // fs ------------------------------------------------------------------------------------------------------------------
 interface FS {
+    // This interface is used for the exports of `require('fs');`
+
     exist(path: string): boolean;
 }
