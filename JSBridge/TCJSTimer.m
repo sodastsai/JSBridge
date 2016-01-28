@@ -25,9 +25,7 @@
 
 @end
 
-@interface TCJSTimer : NSObject <TCJSTimer, TCJSJavaScriptContextExtension> {
-    BOOL _fired;
-}
+@interface TCJSTimer : NSObject <TCJSTimer, TCJSJavaScriptContextExtension>
 
 @property (nonatomic, strong, readonly) JSValue *callback;
 @property (nonatomic, strong, readonly) NSArray *arguments;
