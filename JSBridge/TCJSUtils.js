@@ -16,22 +16,22 @@
 
 'use strict';
 
-var objectToString = exports.objectToString = function(obj) {
+var toString = exports.toString = function(obj) {
     return Object.prototype.toString.call(obj);
 }
 
 exports.isRegExp = function(obj) {
-    return objectToString(obj) === '[object RegExp]';
+    return toString(obj) === '[object RegExp]';
 };
 
 exports.isArray = function(obj) {
-    return objectToString(obj) === '[object Array]';
+    return toString(obj) === '[object Array]';
 };
 
 exports.isDate = function(obj) {
-    return objectToString(obj) === '[object Date]';
+    return toString(obj) === '[object Date]';
 };
 
 exports.isError = function(obj) {
-    return objectToString(obj) === '[object Error]';
+    return toString(obj) === '[object Error]';
 };

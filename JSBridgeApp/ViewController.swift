@@ -18,7 +18,18 @@
 //
 
 import UIKit
+import TCJSBridge
+import JavaScriptCore
 
 class ViewController: UIViewController {
+
+    var context: JSContext!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.context = TCJSJavaScriptContextCreateContext()
+    }
+
 }
 
