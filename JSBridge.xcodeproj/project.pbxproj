@@ -15,6 +15,7 @@
 		FEB7EE9D1C59C85F00B0D44E /* TCJSConsole.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE9C1C59C85F00B0D44E /* TCJSConsole.m */; };
 		FEB7EEA61C59E7C600B0D44E /* TCJSTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEA51C59E7C600B0D44E /* TCJSTimer.m */; };
 		FEB7EEB41C5A0EDF00B0D44E /* TCJSFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEB31C5A0EDF00B0D44E /* TCJSFileSystem.m */; };
+		FEB7EEBA1C5A1C8200B0D44E /* TCJSExtraModules.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEB91C5A1C8200B0D44E /* TCJSExtraModules.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -47,6 +48,8 @@
 		FEB7EEA51C59E7C600B0D44E /* TCJSTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSTimer.m; sourceTree = "<group>"; };
 		FEB7EEB21C5A0EDF00B0D44E /* TCJSFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSFileSystem.h; sourceTree = "<group>"; };
 		FEB7EEB31C5A0EDF00B0D44E /* TCJSFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSFileSystem.m; sourceTree = "<group>"; };
+		FEB7EEB71C5A1C6000B0D44E /* TCJS_underscore_1.8.3.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = TCJS_underscore_1.8.3.js; sourceTree = "<group>"; };
+		FEB7EEB91C5A1C8200B0D44E /* TCJSExtraModules.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSExtraModules.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +97,8 @@
 				FEB7EEB21C5A0EDF00B0D44E /* TCJSFileSystem.h */,
 				FEB7EEB31C5A0EDF00B0D44E /* TCJSFileSystem.m */,
 				FEB7EE8A1C59BF8B00B0D44E /* TCJSUtils.js */,
+				FEB7EEB91C5A1C8200B0D44E /* TCJSExtraModules.m */,
+				FEB7EEB71C5A1C6000B0D44E /* TCJS_underscore_1.8.3.js */,
 			);
 			path = JSBridge;
 			sourceTree = "<group>";
@@ -161,6 +166,7 @@
 				FEB7EEB41C5A0EDF00B0D44E /* TCJSFileSystem.m in Sources */,
 				FEB7EEA61C59E7C600B0D44E /* TCJSTimer.m in Sources */,
 				FEB7EE861C59BAC500B0D44E /* TCJSModule.m in Sources */,
+				FEB7EEBA1C5A1C8200B0D44E /* TCJSExtraModules.m in Sources */,
 				FEB7EE9D1C59C85F00B0D44E /* TCJSConsole.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
