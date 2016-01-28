@@ -1,5 +1,5 @@
 //
-//  TCJSBridge.h
+//  TCJSConsole.h
 //  JSBridge
 //
 //  Copyright 2016 Tien-Che Tsai, and Tickle Labs, Inc.
@@ -17,8 +17,31 @@
 //  limitations under the License.
 //
 
-#import <TCJSBridge/TCJSJavaScriptContext.h>
-#import <TCJSBridge/TCJSModule.h>
-#import <TCJSBridge/TCJSUtils.h>
-#import <TCJSBridge/TCJSApplication.h>
-#import <TCJSBridge/TCJSConsole.h>
+#import <Foundation/Foundation.h>
+#import <JavaScriptCore/JavaScriptCore.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@protocol TCJSOutputConsole <NSObject>
+
+- (void)writeConsoleMessage:(NSString *)message level:(NSString *)level forJavaScriptContext:(JSContext *)context;
+
+@end
+
+@protocol TCJSConsole <JSExport>
+
+- (void)debug;
+- (void)log;
+- (void)info;
+- (void)error;
+- (void)warn;
+
+@end
+
+@interface TCJSConsole : NSObject <TCJSConsole>
+
+@property (nonatomic, strong, nullable) id<TCJSOutputConsole> outputConsole;
+
+@end
+
+NS_ASSUME_NONNULL_END

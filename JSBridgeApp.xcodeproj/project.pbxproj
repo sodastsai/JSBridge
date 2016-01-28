@@ -18,6 +18,8 @@
 		FEB7EE921C59C16C00B0D44E /* RequireTests.js in Resources */ = {isa = PBXBuildFile; fileRef = FEB7EE911C59C16C00B0D44E /* RequireTests.js */; };
 		FEB7EE941C59C17500B0D44E /* RequireTests2.js in Resources */ = {isa = PBXBuildFile; fileRef = FEB7EE931C59C17500B0D44E /* RequireTests2.js */; };
 		FEB7EE971C59C35700B0D44E /* UtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE961C59C35700B0D44E /* UtilsTests.swift */; };
+		FEB7EEA11C59C96C00B0D44E /* ConsoleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEA01C59C96C00B0D44E /* ConsoleTests.swift */; };
+		FEB7EEA31C59C9EA00B0D44E /* ApplicationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEA21C59C9EA00B0D44E /* ApplicationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,8 @@
 		FEB7EE911C59C16C00B0D44E /* RequireTests.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = RequireTests.js; sourceTree = "<group>"; };
 		FEB7EE931C59C17500B0D44E /* RequireTests2.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = RequireTests2.js; sourceTree = "<group>"; };
 		FEB7EE961C59C35700B0D44E /* UtilsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UtilsTests.swift; sourceTree = "<group>"; };
+		FEB7EEA01C59C96C00B0D44E /* ConsoleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleTests.swift; sourceTree = "<group>"; };
+		FEB7EEA21C59C9EA00B0D44E /* ApplicationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +132,8 @@
 				FEB7EE911C59C16C00B0D44E /* RequireTests.js */,
 				FEB7EE931C59C17500B0D44E /* RequireTests2.js */,
 				FEB7EE961C59C35700B0D44E /* UtilsTests.swift */,
+				FEB7EEA01C59C96C00B0D44E /* ConsoleTests.swift */,
+				FEB7EEA21C59C9EA00B0D44E /* ApplicationTests.swift */,
 				FEB7EE951C59C34100B0D44E /* Supporting Files */,
 			);
 			path = JSBridgeTests;
@@ -307,7 +313,9 @@
 			files = (
 				FEB7EE7A1C59B7BD00B0D44E /* JSBridgeTests.swift in Sources */,
 				FEB7EE901C59C0B400B0D44E /* RequireTests.swift in Sources */,
+				FEB7EEA31C59C9EA00B0D44E /* ApplicationTests.swift in Sources */,
 				FEB7EE971C59C35700B0D44E /* UtilsTests.swift in Sources */,
+				FEB7EEA11C59C96C00B0D44E /* ConsoleTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -20,9 +20,13 @@
 #import <Foundation/Foundation.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface TCJSUtil : NSObject
 
 + (NSString *)format;
 + (NSString *)inspect:(JSValue *)object;
 
 @end
+
+NS_ASSUME_NONNULL_END

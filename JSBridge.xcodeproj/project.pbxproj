@@ -11,6 +11,8 @@
 		FEB7EE831C59B95900B0D44E /* TCJSJavaScriptContext.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE821C59B95900B0D44E /* TCJSJavaScriptContext.m */; };
 		FEB7EE861C59BAC500B0D44E /* TCJSModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE851C59BAC500B0D44E /* TCJSModule.m */; };
 		FEB7EE891C59BE6B00B0D44E /* TCJSUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE881C59BE6B00B0D44E /* TCJSUtils.m */; };
+		FEB7EE9A1C59C52600B0D44E /* TCJSApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE991C59C52600B0D44E /* TCJSApplication.m */; };
+		FEB7EE9D1C59C85F00B0D44E /* TCJSConsole.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE9C1C59C85F00B0D44E /* TCJSConsole.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,6 +38,10 @@
 		FEB7EE871C59BE6B00B0D44E /* TCJSUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSUtils.h; sourceTree = "<group>"; };
 		FEB7EE881C59BE6B00B0D44E /* TCJSUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSUtils.m; sourceTree = "<group>"; };
 		FEB7EE8A1C59BF8B00B0D44E /* TCJSUtils.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = TCJSUtils.js; sourceTree = "<group>"; };
+		FEB7EE981C59C52600B0D44E /* TCJSApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSApplication.h; sourceTree = "<group>"; };
+		FEB7EE991C59C52600B0D44E /* TCJSApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSApplication.m; sourceTree = "<group>"; };
+		FEB7EE9B1C59C85F00B0D44E /* TCJSConsole.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSConsole.h; sourceTree = "<group>"; };
+		FEB7EE9C1C59C85F00B0D44E /* TCJSConsole.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSConsole.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +77,10 @@
 				FEB7EE641C59B42800B0D44E /* TCJSBridge.h */,
 				FEB7EE811C59B95900B0D44E /* TCJSJavaScriptContext.h */,
 				FEB7EE821C59B95900B0D44E /* TCJSJavaScriptContext.m */,
+				FEB7EE981C59C52600B0D44E /* TCJSApplication.h */,
+				FEB7EE991C59C52600B0D44E /* TCJSApplication.m */,
+				FEB7EE9B1C59C85F00B0D44E /* TCJSConsole.h */,
+				FEB7EE9C1C59C85F00B0D44E /* TCJSConsole.m */,
 				FEB7EE841C59BAC500B0D44E /* TCJSModule.h */,
 				FEB7EE851C59BAC500B0D44E /* TCJSModule.m */,
 				FEB7EE871C59BE6B00B0D44E /* TCJSUtils.h */,
@@ -137,9 +147,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FEB7EE9A1C59C52600B0D44E /* TCJSApplication.m in Sources */,
 				FEB7EE891C59BE6B00B0D44E /* TCJSUtils.m in Sources */,
 				FEB7EE831C59B95900B0D44E /* TCJSJavaScriptContext.m in Sources */,
 				FEB7EE861C59BAC500B0D44E /* TCJSModule.m in Sources */,
+				FEB7EE9D1C59C85F00B0D44E /* TCJSConsole.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
