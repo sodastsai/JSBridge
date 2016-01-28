@@ -14,6 +14,7 @@
 		FEB7EE9A1C59C52600B0D44E /* TCJSApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE991C59C52600B0D44E /* TCJSApplication.m */; };
 		FEB7EE9D1C59C85F00B0D44E /* TCJSConsole.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE9C1C59C85F00B0D44E /* TCJSConsole.m */; };
 		FEB7EEA61C59E7C600B0D44E /* TCJSTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEA51C59E7C600B0D44E /* TCJSTimer.m */; };
+		FEB7EEB41C5A0EDF00B0D44E /* TCJSFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEB31C5A0EDF00B0D44E /* TCJSFileSystem.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -44,6 +45,8 @@
 		FEB7EE9B1C59C85F00B0D44E /* TCJSConsole.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSConsole.h; sourceTree = "<group>"; };
 		FEB7EE9C1C59C85F00B0D44E /* TCJSConsole.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSConsole.m; sourceTree = "<group>"; };
 		FEB7EEA51C59E7C600B0D44E /* TCJSTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSTimer.m; sourceTree = "<group>"; };
+		FEB7EEB21C5A0EDF00B0D44E /* TCJSFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSFileSystem.h; sourceTree = "<group>"; };
+		FEB7EEB31C5A0EDF00B0D44E /* TCJSFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSFileSystem.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +91,8 @@
 				FEB7EEA51C59E7C600B0D44E /* TCJSTimer.m */,
 				FEB7EE871C59BE6B00B0D44E /* TCJSUtils.h */,
 				FEB7EE881C59BE6B00B0D44E /* TCJSUtils.m */,
+				FEB7EEB21C5A0EDF00B0D44E /* TCJSFileSystem.h */,
+				FEB7EEB31C5A0EDF00B0D44E /* TCJSFileSystem.m */,
 				FEB7EE8A1C59BF8B00B0D44E /* TCJSUtils.js */,
 			);
 			path = JSBridge;
@@ -153,6 +158,7 @@
 				FEB7EE9A1C59C52600B0D44E /* TCJSApplication.m in Sources */,
 				FEB7EE891C59BE6B00B0D44E /* TCJSUtils.m in Sources */,
 				FEB7EE831C59B95900B0D44E /* TCJSJavaScriptContext.m in Sources */,
+				FEB7EEB41C5A0EDF00B0D44E /* TCJSFileSystem.m in Sources */,
 				FEB7EEA61C59E7C600B0D44E /* TCJSTimer.m in Sources */,
 				FEB7EE861C59BAC500B0D44E /* TCJSModule.m in Sources */,
 				FEB7EE9D1C59C85F00B0D44E /* TCJSConsole.m in Sources */,

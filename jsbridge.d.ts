@@ -15,7 +15,7 @@ interface Module {
     paths: [string];  // Readonly, search paths. The `require` function would find scripts under these paths
     require: RequireFunc;  // Import/Load other scripts in.
     clearRequireCache();
-}g
+}
 declare const module: Module;
 declare const require: RequireFunc;  // Import/Load other scripts in.
 
@@ -67,4 +67,10 @@ interface Util {
 
     format(...formats: any[]): string;  // node's format function (`util.format`)
     inspect(obj: any): string;  // node's inspect function (`util.inspect`)
+}
+
+
+// fs ------------------------------------------------------------------------------------------------------------------
+interface FS {
+    exist(path: string): boolean;
 }

@@ -225,6 +225,7 @@
             if (globalModuleLoader) {
                 @autoreleasepool {
                     module = globalModuleLoader();
+                    module.loaded = YES;
                 }
             }
         }
