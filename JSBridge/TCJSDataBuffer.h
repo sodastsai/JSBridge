@@ -1,5 +1,5 @@
 //
-//  TCJSBridge.h
+//  TCJSDataBuffer.h
 //  JSBridge
 //
 //  Copyright 2016 Tien-Che Tsai, and Tickle Labs, Inc.
@@ -17,11 +17,29 @@
 //  limitations under the License.
 //
 
+#import <Foundation/Foundation.h>
+#import <JavaScriptCore/JavaScriptCore.h>
 #import <TCJSBridge/TCJSJavaScriptContext.h>
-#import <TCJSBridge/TCJSModule.h>
-#import <TCJSBridge/TCJSUtils.h>
-#import <TCJSBridge/TCJSApplication.h>
-#import <TCJSBridge/TCJSConsole.h>
-#import <TCJSBridge/TCJSFileSystem.h>
-#import <TCJSBridge/TCJSDispatch.h>
-#import <TCJSBridge/TCJSDataBuffer.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@protocol TCJSDataBuffer <JSExport>
+
++ (instancetype)create;
+
+@property (nonatomic, readwrite) NSUInteger length;
+- (JSValue *)byte;
+
+@property (nonatomic, readonly) NSString *hexDigest;
+
+@end
+
+@interface TCJSDataBuffer : NSObject <TCJSDataBuffer, TCJSJavaScriptContextExtension>
+
+@property (nonatomic, strong, readonly) NSMutableData *data;
+
+- (instancetype)initWithLength:(NSUInteger)length NS_DESIGNATED_INITIALIZER;
+
+@end
+
+NS_ASSUME_NONNULL_END

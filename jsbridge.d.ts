@@ -3,21 +3,20 @@ declare const root: any;  // Alias of root object
 
 
 // Module --------------------------------------------------------------------------------------------------------------
-interface RequireFunc {
+interface IRequireFunc {
     (path: string): any;
     resolve(path: string): string;
 }
-interface Module {
-    // Current module object
+interface IModule { // Current module object
     filename: string;  // Readonly, file name of current script. Use this as __filename and __dirname in node.
     loaded: boolean;  // Readonly, indicating whether the script content is loaded of not
     exports: any;  // Exports symbols
     paths: [string];  // Readonly, search paths. The `require` function would find scripts under these paths
-    require: RequireFunc;  // Import/Load other scripts in.
+    require: IRequireFunc;  // Import/Load other scripts in.
     clearRequireCache();
 }
-declare const module: Module;
-declare const require: RequireFunc;  // Import/Load other scripts in.
+declare const module: IModule;
+declare const require: IRequireFunc;  // Import/Load other scripts in.
 
 /* Global Modules
  *
@@ -57,9 +56,7 @@ declare const system: {
 
 
 // Util ----------------------------------------------------------------------------------------------------------------
-interface Util {
-    // This interface is used for the exports of `require('util');`
-
+interface IUtil {  // This interface is used for the exports of `require('util');`
     toString(obj: any): string;
 
     isRegExp(obj: any): boolean;
@@ -80,9 +77,25 @@ interface Util {
 }
 
 
+// DataBuffer ----------------------------------------------------------------------------------------------------------
+declare namespace DataBuffer {
+    function create(length?: number): IDataBuffer
+
+    interface IDataBuffer {
+        length: number;
+
+        byte(): number[];  // Get a number array which represents this buffer
+        byte(index: number): number;  // Get a byte at index
+        byte(index: number, value: number);  // Set a byte at index by number (0-255)
+        byte(index: number, value: string);  // Set a byte at index by hex string ('0'-'ff')
+
+        hexDigest: string;  // Get hex string representation of this buffer
+    }
+}
+
+
 // fs ------------------------------------------------------------------------------------------------------------------
-interface FS {
-    // This interface is used for the exports of `require('fs');`
+interface IFs {  // This interface is used for the exports of `require('fs');`
 
     existsSync(path: string): boolean;
     exists(path: string, callback?: (exist: boolean) => void);
@@ -93,8 +106,7 @@ interface FS {
 
 
 // dispatch ------------------------------------------------------------------------------------------------------------
-interface Dispatch {
-    // This interface is used for the exports of `require('dispatch');`
+interface IDispatch {  // This interface is used for the exports of `require('dispatch');`
 
     /* queue names */
     // Readonly, used to render iOS UI (the `dispatch_get_main_queue()` in iOS)
