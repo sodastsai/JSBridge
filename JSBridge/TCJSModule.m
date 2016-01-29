@@ -142,12 +142,12 @@
                 NSString *paddedScript = [NSString stringWithFormat:
                                           @"(function() {\n"
                                           @"    function _scriptLoader(module, exports, require) {\n"
-                                          @"        function _scriptBody(module, exports, require) {\n"
+                                          @"        function _scriptBody() {\n"
                                           @"            /* --- Start of Script Body --- */\n"
                                           @"%@\n"
                                           @"            /* --- End of Script Body --- */\n"
                                           @"        }\n"
-                                          @"        _scriptBody.apply(exports, arguments);\n"
+                                          @"        _scriptBody.apply(exports);\n"
                                           @"    }\n"
                                           @"    return _scriptLoader;\n"
                                           @"})();\n", script];
@@ -162,7 +162,9 @@
                     self.exports,
                     ^JSValue *(NSString *path){ return [self require:path]; },
                 ]];
-                _loaded = YES;
+                if (!(_loaded = context.exception == nil)) {
+                    return self = nil;
+                }
             }
         }
     }
