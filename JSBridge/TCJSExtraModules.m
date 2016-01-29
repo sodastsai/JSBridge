@@ -27,13 +27,13 @@
 @implementation TCJSExtraModules
 
 + (void)load {
-    [TCJSModule registerGlobalModuleNamed:@"underscore" withBlock:^TCJSModule * _Nonnull{
+    [TCJSModule registerGlobalModuleNamed:@"underscore" withBlock:^TCJSModule *(JSContext *context) {
         return [[TCJSModule alloc]
                 initWithScriptContentsOfFile:[[NSBundle bundleForClass:TCJSExtraModules.class]
                                               pathForResource:@"TCJS_underscore_1.8.3" ofType:@"js"]];
     }];
 
-    [TCJSModule registerGlobalModuleNamed:@"q" withBlock:^TCJSModule * _Nonnull{
+    [TCJSModule registerGlobalModuleNamed:@"q" withBlock:^TCJSModule *(JSContext *context) {
         return [[TCJSModule alloc] initWithScriptContentsOfFile:[[NSBundle bundleForClass:TCJSExtraModules.class]
                                                                  pathForResource:@"TCJS_q_1.4.1" ofType:@"js"]];
     }];

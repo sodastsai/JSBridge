@@ -46,7 +46,7 @@
     context[@"require"] = module.require;
 }
 
-+ (NSMutableDictionary<NSString *, TCJSModule *(^)(void)> *)registeredGlobalModules {
++ (NSMutableDictionary<NSString *, TCJSModule *(^)(JSContext *)> *)registeredGlobalModules {
     static NSMutableDictionary *registeredGlobalModules;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -55,7 +55,7 @@
     return registeredGlobalModules;
 }
 
-+ (void)registerGlobalModuleNamed:(NSString *)globalModuleName withBlock:(TCJSModule *(^)(void))block {
++ (void)registerGlobalModuleNamed:(NSString *)globalModuleName withBlock:(TCJSModule *(^)(JSContext *))block {
     self.registeredGlobalModules[globalModuleName] = block;
 }
 
@@ -227,10 +227,10 @@
                 module = [[TCJSModule alloc] initWithScriptContentsOfFile:fullJSPath loadPaths:self.paths];
             }
         } else {
-            TCJSModule *(^globalModuleLoader)(void) = self.class.registeredGlobalModules[jsPath];
+            TCJSModule *(^globalModuleLoader)(JSContext *) = self.class.registeredGlobalModules[jsPath];
             if (globalModuleLoader) {
                 @autoreleasepool {
-                    module = globalModuleLoader();
+                    module = globalModuleLoader(currentContext);
                     module.loaded = YES;
                 }
             }

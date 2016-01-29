@@ -32,7 +32,7 @@
 }
 
 + (void)load {
-    [TCJSModule registerGlobalModuleNamed:@"fs" withBlock:^TCJSModule * _Nonnull{
+    [TCJSModule registerGlobalModuleNamed:@"fs" withBlock:^TCJSModule *(JSContext *context) {
         TCJSModule *module = [[TCJSModule alloc] init];
         module.exports = [JSValue valueWithObject:[TCJSFileSystem defaultFileSystem]
                                         inContext:[JSContext currentContext]];
