@@ -27,7 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol TCJSFileSystem <JSExport>
 
-- (BOOL)exists:(NSString *)path;
+- (BOOL)existsSync:(NSString *)path;
+JSExportAs(exists, - (void)exists:(NSString *)path callback:(JSValue *)callback);
 
 @end
 

@@ -82,5 +82,6 @@ interface Util {
 interface FS {
     // This interface is used for the exports of `require('fs');`
 
-    exist(path: string): boolean;
+    existsSync(path: string): boolean;
+    exists(path: string, callback?: (exist: boolean) => void);
 }

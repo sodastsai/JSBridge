@@ -18,6 +18,7 @@
 //
 
 #import "TCJSFileSystem.h"
+#import <BenzeneFoundation/BenzeneFoundation.h>
 
 @implementation TCJSFileSystem
 
@@ -64,8 +65,20 @@
 
 #pragma mark - Method
 
-- (BOOL)exists:(NSString *)path {
+- (BOOL)existsSync:(NSString *)path {
     return [self hasPermissionToReadFileAtPath:path] && [[NSFileManager defaultManager] fileExistsAtPath:path];
+}
+
+- (void)exists:(NSString *)path callback:(JSValue *)callback {
+    JSContext *context = [JSContext currentContext];
+    dispatch_async(TCJSJavaScriptContextGetBackgroundDispatchQueue(context), ^{
+        BOOL exists = [[TCJSFileSystem defaultFileSystem] existsSync:path];
+        dispatch_async(TCJSJavaScriptContextGetMainDispatchQueue(context), ^{
+            if (!callback.isUndefined) {
+                [callback callWithArguments:@[@(exists)]];
+            }
+        });
+    });
 }
 
 @end
