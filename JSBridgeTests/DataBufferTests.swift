@@ -29,39 +29,39 @@ class DataBufferTests: JSBridgeTests {
         let dataBuffer2 = self.context.evaluateScript("DataBuffer.create(20);")
             .toObjectOfClass(TCJSDataBuffer) as! TCJSDataBuffer
 
-        XCTAssertEqual(dataBuffer1.length, 0)
-        XCTAssertEqual(dataBuffer2.length, 20)
+        XCTAssertEqual(dataBuffer1.data.length, 0)
+        XCTAssertEqual(dataBuffer2.data.length, 20)
     }
 
     func testFromHexString() {
         let dataBuffer = self.context.evaluateScript("DataBuffer.fromHexString(\"00ffcc3e\");")
             .toObjectOfClass(TCJSDataBuffer) as! TCJSDataBuffer
         XCTAssertEqual(dataBuffer.data, NSData(bytes: [0x00, 0xff, 0xcc, 0x3e] as [UInt8], length: 4))
-        XCTAssertEqual(dataBuffer.length, 4)
+        XCTAssertEqual(dataBuffer.data.length, 4)
     }
 
     func testFromByteArray() {
         let dataBuffer = self.context.evaluateScript("DataBuffer.fromByteArray([1, 2, 127, 255]);")
             .toObjectOfClass(TCJSDataBuffer) as! TCJSDataBuffer
         XCTAssertEqual(dataBuffer.data, NSData(bytes: [0x01, 0x02, 0x7f, 0xff] as [UInt8], length: 4))
-        XCTAssertEqual(dataBuffer.length, 4)
+        XCTAssertEqual(dataBuffer.data.length, 4)
     }
 
     func testSubDataBuffer() {
         var dataBuffer = self.context.evaluateScript("DataBuffer.fromByteArray([1, 2, 127, 255]).subDataBuffer(0, 2);")
             .toObjectOfClass(TCJSDataBuffer) as! TCJSDataBuffer
         XCTAssertEqual(dataBuffer.data, NSData(bytes: [0x01, 0x02] as [UInt8], length: 2))
-        XCTAssertEqual(dataBuffer.length, 2)
+        XCTAssertEqual(dataBuffer.data.length, 2)
 
         dataBuffer = self.context.evaluateScript("DataBuffer.fromByteArray([1, 2, 127, 255]).subDataBuffer(1, 3);")
             .toObjectOfClass(TCJSDataBuffer) as! TCJSDataBuffer
         XCTAssertEqual(dataBuffer.data, NSData(bytes: [0x02, 0x7f, 0xff] as [UInt8], length: 3))
-        XCTAssertEqual(dataBuffer.length, 3)
+        XCTAssertEqual(dataBuffer.data.length, 3)
 
         dataBuffer = self.context.evaluateScript("DataBuffer.fromByteArray([1, 2, 127, 255]).subDataBuffer(2, 0);")
             .toObjectOfClass(TCJSDataBuffer) as! TCJSDataBuffer
         XCTAssertEqual(dataBuffer.data, NSData())
-        XCTAssertEqual(dataBuffer.length, 0)
+        XCTAssertEqual(dataBuffer.data.length, 0)
     }
 
     func testCopyAsNewDataBuffer() {
@@ -92,7 +92,7 @@ class DataBufferTests: JSBridgeTests {
         self.context.globalObject.setValue(dataBuffer1, forProperty: "dataBuffer1")
         self.context.globalObject.setValue(dataBuffer2, forProperty: "dataBuffer2")
         self.context.evaluateScript("dataBuffer1.append(dataBuffer2);")
-        XCTAssertEqual(dataBuffer1.length, 5)
+        XCTAssertEqual(dataBuffer1.data.length, 5)
         XCTAssertEqual(dataBuffer1.data, NSMutableData(bytes: [0x01, 0x02, 0x07, 0x68, 0xfc] as [UInt8], length: 5))
     }
 

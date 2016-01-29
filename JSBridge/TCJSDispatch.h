@@ -27,18 +27,7 @@ extern NSString *const TCJSDispatchManagerIOQueueName;
 extern NSString *const TCJSDispatchManagerMainQueueName;
 extern NSString *const TCJSDispatchManagerBackgroundQueueName;
 
-@protocol TCJSDispatchManager <JSExport>
-
-@property (nonatomic, strong, readonly, nullable) NSString *uiQueue;
-@property (nonatomic, strong, readonly) NSString *ioQueue;
-@property (nonatomic, strong, readonly) NSString *mainQueue;
-@property (nonatomic, strong, readonly) NSString *backgroundQueue;
-
-- (void)async;
-
-@end
-
-@interface TCJSDispatchManager : NSObject <TCJSDispatchManager>
+@interface TCJSDispatchManager : NSObject
 
 + (instancetype)sharedManager;
 

@@ -25,40 +25,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class TCJSConsole;
 
-@protocol TCJSApplication <JSExport>
+@interface TCJSApplication : NSObject <TCJSJavaScriptContextExtension>
 
-@property (nonatomic, readonly) NSString *version;
-@property (nonatomic, readonly) NSString *build;
-@property (nonatomic, readonly) NSString *identifier;
-
-@property (nonatomic, readonly) NSString *locale;
-@property (nonatomic, readonly) NSArray<NSString *> *preferredLanguages;
++ (instancetype)currentApplication;
 
 @property (nonatomic, strong, readonly) TCJSConsole *console;
 
 @end
 
-@interface TCJSApplication : NSObject <TCJSApplication, TCJSJavaScriptContextExtension>
+@interface TCJSSystem : NSObject <TCJSJavaScriptContextExtension>
 
-+ (instancetype)currentApplication;
-
-@end
-
-@protocol TCJSSystem <JSExport>
-
-@property (nonatomic, readonly) NSString *version;
-@property (nonatomic, readonly) NSString *name;
-@property (nonatomic, readonly) NSString *model;
++ (instancetype)currentSystem;
 
 #if DEBUG
 - (void)_garbageCollect;
 #endif
-
-@end
-
-@interface TCJSSystem : NSObject <TCJSSystem, TCJSJavaScriptContextExtension>
-
-+ (instancetype)currentSystem;
 
 @end
 

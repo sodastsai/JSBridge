@@ -20,6 +20,20 @@
 #import "TCJSConsole.h"
 #import "TCJSUtils.h"
 
+@protocol TCJSConsole <JSExport>
+
+- (void)debug;
+- (void)log;
+- (void)info;
+- (void)error;
+- (void)warn;
+
+@end
+
+@interface TCJSConsole () <TCJSConsole>
+
+@end
+
 @implementation TCJSConsole
 
 - (void)printMessageForJSSelector:(SEL)selector {

@@ -19,7 +19,34 @@
 
 #import "TCJSDataBuffer.h"
 #import "TCJSUtils.h"
+#import "TCJSJavaScriptContext.h"
 #import <BenzeneFoundation/BenzeneFoundation.h>
+
+@protocol TCJSDataBuffer <JSExport>
+
++ (instancetype)create;
++ (instancetype)fromHexString:(NSString *)string;
++ (instancetype)fromByteArray:(NSArray<NSNumber *> *)bytes;
+
+JSExportAs(subDataBuffer, - (nullable instancetype)subDataBufferFromIndex:(NSUInteger)start length:(NSUInteger)length);
+- (instancetype)copyAsNewDataBuffer;
+
+@property (nonatomic, readwrite) NSUInteger length;
+
+// Content
+@property (nonatomic, readonly) NSString *hexString;
+- (JSValue *)byte;
+- (BOOL)equal:(TCJSDataBuffer *)dataBuffer;
+
+- (void)append:(TCJSDataBuffer *)dataBuffer;
+JSExportAs(delete, - (void)deleteBytesFromIndex:(NSUInteger)start length:(NSUInteger)length);
+JSExportAs(insert, - (void)insertDataBuffer:(TCJSDataBuffer *)dataBuffer atIndex:(NSUInteger)index);
+
+@end
+
+@interface TCJSDataBuffer () <TCJSDataBuffer, TCJSJavaScriptContextExtension>
+
+@end
 
 @implementation TCJSDataBuffer
 

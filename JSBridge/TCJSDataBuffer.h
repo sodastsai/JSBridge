@@ -18,36 +18,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <JavaScriptCore/JavaScriptCore.h>
-#import <TCJSBridge/TCJSJavaScriptContext.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class TCJSDataBuffer;
-
-@protocol TCJSDataBuffer <JSExport>
-
-+ (instancetype)create;
-+ (instancetype)fromHexString:(NSString *)string;
-+ (instancetype)fromByteArray:(NSArray<NSNumber *> *)bytes;
-
-JSExportAs(subDataBuffer, - (nullable instancetype)subDataBufferFromIndex:(NSUInteger)start length:(NSUInteger)length);
-- (instancetype)copyAsNewDataBuffer;
-
-@property (nonatomic, readwrite) NSUInteger length;
-
-// Content
-@property (nonatomic, readonly) NSString *hexString;
-- (JSValue *)byte;
-- (BOOL)equal:(TCJSDataBuffer *)dataBuffer;
-
-- (void)append:(TCJSDataBuffer *)dataBuffer;
-JSExportAs(delete, - (void)deleteBytesFromIndex:(NSUInteger)start length:(NSUInteger)length);
-JSExportAs(insert, - (void)insertDataBuffer:(TCJSDataBuffer *)dataBuffer atIndex:(NSUInteger)index);
-
-@end
-
-@interface TCJSDataBuffer : NSObject <TCJSDataBuffer, TCJSJavaScriptContextExtension>
+@interface TCJSDataBuffer : NSObject
 
 @property (nonatomic, strong, readonly) NSMutableData *data;
 

@@ -28,17 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@protocol TCJSConsole <JSExport>
-
-- (void)debug;
-- (void)log;
-- (void)info;
-- (void)error;
-- (void)warn;
-
-@end
-
-@interface TCJSConsole : NSObject <TCJSConsole>
+@interface TCJSConsole : NSObject
 
 @property (nonatomic, weak, nullable) id<TCJSOutputConsole> outputConsole;
 

@@ -28,6 +28,21 @@ NSString *const TCJSDispatchManagerIOQueueName = @"TCJSDispatchManagerIOQueue";
 NSString *const TCJSDispatchManagerMainQueueName = @"TCJSDispatchManagerMainQueue";
 NSString *const TCJSDispatchManagerBackgroundQueueName = @"TCJSDispatchManagerBackgroundQueue";
 
+@protocol TCJSDispatchManager <JSExport>
+
+@property (nonatomic, strong, readonly, nullable) NSString *uiQueue;
+@property (nonatomic, strong, readonly) NSString *ioQueue;
+@property (nonatomic, strong, readonly) NSString *mainQueue;
+@property (nonatomic, strong, readonly) NSString *backgroundQueue;
+
+- (void)async;
+
+@end
+
+@interface TCJSDispatchManager () <TCJSDispatchManager>
+
+@end
+
 @implementation TCJSDispatchManager
 
 + (void)load {
