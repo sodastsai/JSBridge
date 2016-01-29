@@ -1,4 +1,7 @@
 PODS:
+  - BenzeneFoundation (0.5.40):
+    - BenzeneFoundation/Foundation (= 0.5.40)
+    - BenzeneFoundation/UIKit (= 0.5.40)
   - BenzeneFoundation/Foundation (0.5.40):
     - libextobjc (~> 0.4)
   - BenzeneFoundation/UIKit (0.5.40):
@@ -44,9 +47,12 @@ PODS:
     - libextobjc
 
 DEPENDENCIES:
+  - BenzeneFoundation (from `/Users/sodas/Work/Wantoto/wantoto-kit`)
   - TCJSBridge (from `.`)
 
 EXTERNAL SOURCES:
+  BenzeneFoundation:
+    :path: "/Users/sodas/Work/Wantoto/wantoto-kit"
   TCJSBridge:
     :path: "."
 

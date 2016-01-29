@@ -53,8 +53,8 @@ NSString *const TCJSDispatchManagerBackgroundQueueName = @"TCJSDispatchManagerBa
     dispatch_async(TCJSJavaScriptContextGetBackgroundDispatchQueue(context), ^{
         NSArray *arguments = block(context);
         dispatch_async(TCJSJavaScriptContextGetMainDispatchQueue(context), ^{
-            if ([TCJSUtil isFunction:callback context:context]) {
-                [callback callWithArguments:arguments];
+            if (callback && [TCJSUtil isFunction:callback context:context]) {
+                [callback callWithArguments:arguments?:@[]];
             }
         });
     });
