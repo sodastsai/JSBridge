@@ -36,11 +36,10 @@ class ExtraModulesTests: JSBridgeTests {
 
         // Wait for a while ... (since Promise is asynchronous)
         let expectation = self.expectationWithDescription("wait")
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.1*Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+        after(0.1) {
             XCTAssertEqual(self.context.globalObject.valueForProperty("result").toNumber(), 10)
             expectation.fulfill()
         }
-        self.waitForExpectationsWithTimeout(1, handler: nil)
     }
     
 }

@@ -41,13 +41,25 @@ class FileSystemTests: JSBridgeTests, FileSystemTestsBody, TCJSFileSystemDelegat
 
     // MARK: - Test Body
 
-    func testExists() {
-        XCTAssertFalse(self.context.evaluateScript("fs.exists('/');").toBool())
+    func testExistsSync() {
+        XCTAssertFalse(self.context.evaluateScript("fs.existsSync('/');").toBool())
 
         let requireJSPath = (self.bundle.bundlePath as NSString).stringByAppendingPathComponent("RequireTests.js")
         let require1JSPath = (self.bundle.bundlePath as NSString).stringByAppendingPathComponent("RequireTestsABC.js")
-        XCTAssertTrue(self.context.evaluateScript("fs.exists('\(requireJSPath)');").toBool())
-        XCTAssertFalse(self.context.evaluateScript("fs.exists('\(require1JSPath)');").toBool())
+        XCTAssertTrue(self.context.evaluateScript("fs.existsSync('\(requireJSPath)');").toBool())
+        XCTAssertFalse(self.context.evaluateScript("fs.existsSync('\(require1JSPath)');").toBool())
+    }
+
+    func testExists() {
+        let requireJS1Path = (self.bundle.bundlePath as NSString).stringByAppendingPathComponent("RequireTests.js")
+        let requireJS2Path = (self.bundle.bundlePath as NSString).stringByAppendingPathComponent("RequireTestsABC.js")
+        self.context.evaluateScript("var exists1 = false, exists2 = false;")
+        self.context.evaluateScript("fs.exists('\(requireJS1Path)', function(exists) { exists1 = exists; });")
+        self.context.evaluateScript("fs.exists('\(requireJS2Path)', function(exists) { exists2 = exists; });")
+        after(1) {
+            XCTAssertTrue(self.context.globalObject.valueForProperty("exists1").toBool())
+            XCTAssertFalse(self.context.globalObject.valueForProperty("exists2").toBool())
+        }
     }
 
 }

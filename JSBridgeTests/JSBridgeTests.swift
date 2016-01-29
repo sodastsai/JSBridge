@@ -39,4 +39,14 @@ class JSBridgeTests: XCTestCase {
         self.context = nil
         super.tearDown()
     }
+
+    func after(timeInterval: NSTimeInterval, block: () -> Void) {
+        let expectation = self.expectationWithDescription("after")
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(timeInterval*Double(NSEC_PER_SEC))),
+            dispatch_get_main_queue()) {
+                block()
+                expectation.fulfill()
+        }
+        self.waitForExpectationsWithTimeout(10, handler: nil)
+    }
 }
