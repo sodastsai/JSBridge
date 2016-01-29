@@ -96,7 +96,9 @@
     NSArray<JSValue *> *arguments = [JSContext currentArguments];
     JSValue *filenameValue;
     JSValue *callback;
-    if (arguments.count == 1) {
+    if (arguments.count == 0) {
+        // pass ...
+    } else if (arguments.count == 1) {
         filenameValue = arguments[0];
     } else {
         filenameValue = arguments[0];
@@ -128,7 +130,47 @@
 }
 
 - (void)writeFile {
+    JSContext *context = [JSContext currentContext];
+    NSArray<JSValue *> *arguments = [JSContext currentArguments];
+    JSValue *filenameValue;
+    JSValue *dataBufferValue;
+    JSValue *callback;
+    if (arguments.count <= 1) {
+        filenameValue = arguments.firstObject;
+    } else if (arguments.count == 2) {
+        filenameValue = arguments[0];
+        dataBufferValue = arguments[1];
+    } else if (arguments.count >= 3) {
+        filenameValue = arguments[0];
+        dataBufferValue = arguments[1];
+        callback = arguments[2];
+    }
+    if (!filenameValue.isString) {
+        context.exception = [JSValue valueWithNewErrorFromMessage:@"filename must be a string" inContext:context];
+        return;
+    }
+    TCJSDataBuffer *dataBuffer = [dataBufferValue toObjectOfClass:TCJSDataBuffer.class];
+    if (!dataBuffer) {
+        context.exception = [JSValue valueWithNewErrorFromMessage:@"dataBuffer must be a DataBuffer" inContext:context];
+        return;
+    }
 
+    NSString *filename = filenameValue.toString;
+    [TCJSDispatchManager asyncExecute:^NSArray *(JSContext *context) {
+        if ([self hasPermissionToWriteFileAtPath:filename]) {
+            NSError *error;
+            if ([dataBuffer.data writeToFile:filename options:NSDataWritingAtomic error:&error]) {
+                return @[[JSValue valueWithNullInContext:context]];
+            } else {
+                JSValue *errorValue = [JSValue valueWithNewErrorFromMessage:error.localizedDescription
+                                                                  inContext:context];
+                return @[errorValue];
+            }
+        } else {
+            JSValue *error = [JSValue valueWithNewErrorFromMessage:@"Permission denied" inContext:context];
+            return @[error];
+        }
+    } callback:callback];
 }
 
 @end
