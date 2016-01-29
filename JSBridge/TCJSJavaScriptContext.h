@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 TCJS_EXTERN void TCJSJavaScriptContextRegisterExtension(Class extension);
 
-TCJS_EXTERN JSContext *TCJSJavaScriptContextCreateContext();
+TCJS_EXTERN void TCJSJavaScriptContextSetupContext(JSContext *context);
 
 TCJS_EXTERN void TCJSJavaScriptContextSetMainDispatchQueue(JSContext *context,
                                                            dispatch_queue_t _Nullable dispatchQueue);

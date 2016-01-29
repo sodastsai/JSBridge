@@ -28,7 +28,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.context = TCJSJavaScriptContextCreateContext()
+        self.context = JSContext()
+        TCJSJavaScriptContextSetupContext(self.context)
     }
 
 }

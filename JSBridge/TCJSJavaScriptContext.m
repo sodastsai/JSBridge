@@ -39,13 +39,11 @@ TCJS_EXTERN void TCJSJavaScriptContextRegisterExtension(Class extension) {
     [TCJSJavaScriptContextRegisteredExtensions() addObject:extension];
 }
 
-TCJS_EXTERN JSContext *TCJSJavaScriptContextCreateContext() {
-    JSContext *context = [[JSContext alloc] init];
+TCJS_EXTERN void TCJSJavaScriptContextSetupContext(JSContext *context) {
     context[@"global"] = context[@"root"] = context.globalObject;
     for (Class ExtClass in TCJSJavaScriptContextRegisteredExtensions()) {
         [ExtClass loadExtensionForJSContext:context];
     }
-    return context;
 }
 
 static char TCJSJavaScriptContextMainDispatchQueueAssociationKey;
