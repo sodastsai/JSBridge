@@ -84,6 +84,9 @@ declare namespace DataBuffer {
     function fromByteArray(byteArray: number[]): IDataBuffer;
 
     interface IDataBuffer {
+        // By changing this field, the content of this data buffer would be also modified.
+        // So if you want extend this buffer, just increase the number. (new bytes are filled by 0.)
+        // And if you want to reduce the size, just decrease the number. (existed bytes are dropped.)
         length: number;
 
         byte(): number[];  // Get a number array which represents this buffer
@@ -92,10 +95,12 @@ declare namespace DataBuffer {
         byte(index: number, value: string);  // Set a byte at index by hex string ('0'-'ff')
 
         hexString: string;  // Get hex string representation of this buffer
-
         equal(dataBuffer: IDataBuffer): boolean;  // Compare the content instead of the object itself
 
         append(dataBuffer: IDataBuffer);
+        delete(start: number, length: number);  // Remove bytes in range
+        insert(dataBuffer: IDataBuffer, index: number);  // Insert data buffer at index
+
         subDataBuffer(start: number, length: number): IDataBuffer;  // Get subset of data buffer
         copyAsNewDataBuffer(): IDataBuffer;
     }

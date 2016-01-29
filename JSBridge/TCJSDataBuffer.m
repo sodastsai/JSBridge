@@ -37,31 +37,11 @@
 }
 
 + (instancetype)fromHexString:(NSString *)string {
-    NSData *inputData = [BFHash dataFromHexdigestString:string];
-    if (inputData) {
-        return [[TCJSDataBuffer alloc] initWithData:[inputData mutableCopy]];
-    } else {
-        return nil;
-    }
+    return [[TCJSDataBuffer alloc] initWithData:[[NSData dataWithHexString:string] mutableCopy]];
 }
 
 + (instancetype)fromByteArray:(NSArray<NSNumber *> *)bytes {
-    TCJSDataBuffer *dataBuffer = [[TCJSDataBuffer alloc] initWithLength:bytes.count];
-    uint8_t *dataBytes = (uint8_t *)dataBuffer.data.mutableBytes;
-
-    BOOL __block validValue = YES;
-    [bytes enumerateObjectsUsingBlock:^(NSNumber *byte, NSUInteger idx, BOOL *stop) {
-        if ((validValue = byte.integerValue < 256)) {
-            dataBytes[idx] = byte.charValue;
-        } else {
-            *stop = YES;
-        }
-    }];
-    if (validValue) {
-        return dataBuffer;
-    } else {
-        return nil;
-    }
+    return [[TCJSDataBuffer alloc] initWithData:[[NSData dataWithByteArray:bytes] mutableCopy]];
 }
 
 #pragma mark - Object Lifecycle
@@ -142,7 +122,7 @@
         if (arguments[1].isString) {
             NSScanner *scanner = [NSScanner scannerWithString:arguments[1].toString];
             unsigned int _value = 0;
-            if ((validValue = [scanner scanHexInt:&_value] && _value < 256)) {
+            if ((validValue = [scanner scanHexInt:&_value] && scanner.atEnd && _value < 256)) {
                 value = (uint8_t)_value;
             }
         } else if (arguments[1].isNumber) {
@@ -173,18 +153,39 @@
     [self.data appendData:dataBuffer.data];
 }
 
-- (instancetype)subDataBufferFrom:(NSUInteger)start length:(NSUInteger)length {
+- (instancetype)subDataBufferFromIndex:(NSUInteger)start length:(NSUInteger)length {
     if (start+length > self.data.length) {
         NSString *message = BFFormatString(@"Out of bound. (0..%ld)", self.data.length-1);
-        [JSContext currentContext].exception = [JSValue valueWithNewErrorFromMessage:message
-                                                                           inContext:[JSContext currentContext]];
+        JSContext *context = [JSContext currentContext];
+        context.exception = [JSValue valueWithNewErrorFromMessage:message inContext:context];
         return nil;
     }
     return [[TCJSDataBuffer alloc] initWithData:[[self.data subdataWithRange:NSMakeRange(start, length)] mutableCopy]];
 }
 
 - (instancetype)copyAsNewDataBuffer {
-    return [self subDataBufferFrom:0 length:self.length];
+    return [[TCJSDataBuffer alloc] initWithData:[self.data mutableCopy]];
+}
+
+- (void)deleteBytesFromIndex:(NSUInteger)start length:(NSUInteger)length {
+    if (start+length > self.data.length) {
+        NSString *message = BFFormatString(@"Out of bound. (0..%ld)", self.data.length-1);
+        JSContext *context = [JSContext currentContext];
+        context.exception = [JSValue valueWithNewErrorFromMessage:message inContext:context];
+        return;
+    }
+
+    [self.data replaceBytesInRange:NSMakeRange(start, length) withBytes:NULL length:0];
+}
+
+- (void)insertDataBuffer:(TCJSDataBuffer *)dataBuffer atIndex:(NSUInteger)index {
+    if (index >= self.data.length) {
+        NSString *message = BFFormatString(@"Out of bound. (0..%ld)", self.data.length-1);
+        JSContext *context = [JSContext currentContext];
+        context.exception = [JSValue valueWithNewErrorFromMessage:message inContext:context];
+        return;
+    }
+    [self.data replaceBytesInRange:NSMakeRange(index, 0) withBytes:dataBuffer.data.bytes length:dataBuffer.data.length];
 }
 
 @end

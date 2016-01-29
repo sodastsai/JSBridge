@@ -31,15 +31,19 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)fromHexString:(NSString *)string;
 + (instancetype)fromByteArray:(NSArray<NSNumber *> *)bytes;
 
-JSExportAs(subDataBuffer, - (nullable instancetype)subDataBufferFrom:(NSUInteger)start length:(NSUInteger)length);
+JSExportAs(subDataBuffer, - (nullable instancetype)subDataBufferFromIndex:(NSUInteger)start length:(NSUInteger)length);
 - (instancetype)copyAsNewDataBuffer;
 
-// Content
 @property (nonatomic, readwrite) NSUInteger length;
+
+// Content
 @property (nonatomic, readonly) NSString *hexString;
 - (JSValue *)byte;
-- (void)append:(TCJSDataBuffer *)dataBuffer;
 - (BOOL)equal:(TCJSDataBuffer *)dataBuffer;
+
+- (void)append:(TCJSDataBuffer *)dataBuffer;
+JSExportAs(delete, - (void)deleteBytesFromIndex:(NSUInteger)start length:(NSUInteger)length);
+JSExportAs(insert, - (void)insertDataBuffer:(TCJSDataBuffer *)dataBuffer atIndex:(NSUInteger)index);
 
 @end
 
