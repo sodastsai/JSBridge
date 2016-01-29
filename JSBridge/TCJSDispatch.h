@@ -44,6 +44,9 @@ extern NSString *const TCJSDispatchManagerBackgroundQueueName;
 
 @property (nonatomic, assign) BOOL shouldExposeUIQueue;
 
+// NOTE: return value of the block would be arguments of the callback
++ (void)asyncExecute:(NSArray *(^)(void))block callback:(JSValue *)callback;
+
 @end
 
 NS_ASSUME_NONNULL_END

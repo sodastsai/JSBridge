@@ -48,6 +48,18 @@ NSString *const TCJSDispatchManagerBackgroundQueueName = @"TCJSDispatchManagerBa
     return sharedManager;
 }
 
++ (void)asyncExecute:(NSArray *(^)(void))block callback:(JSValue *)callback {
+    JSContext *context = [JSContext currentContext];
+    dispatch_async(TCJSJavaScriptContextGetBackgroundDispatchQueue(context), ^{
+        NSArray *arguments = block();
+        dispatch_async(TCJSJavaScriptContextGetMainDispatchQueue(context), ^{
+            if (!callback.isUndefined) {
+                [callback callWithArguments:arguments];
+            }
+        });
+    });
+}
+
 #pragma mark - Properties
 
 - (nullable NSString *)uiQueue {

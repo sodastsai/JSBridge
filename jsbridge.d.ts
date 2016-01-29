@@ -86,6 +86,9 @@ interface FS {
 
     existsSync(path: string): boolean;
     exists(path: string, callback?: (exist: boolean) => void);
+
+    isDirectorySync(path: string): boolean;
+    isDirectory(path: string, callback?: (exist: boolean) => void);
 }
 
 

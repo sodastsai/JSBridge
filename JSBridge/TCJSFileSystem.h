@@ -29,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)existsSync:(NSString *)path;
 JSExportAs(exists, - (void)exists:(NSString *)path callback:(JSValue *)callback);
+- (BOOL)isDirectorySync:(NSString *)path;
+JSExportAs(isDirectory, - (void)isDirectory:(NSString *)path callback:(JSValue *)callback);
 
 @end
 

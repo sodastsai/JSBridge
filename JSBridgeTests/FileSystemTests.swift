@@ -36,7 +36,7 @@ class FileSystemTests: JSBridgeTests, FileSystemTestsBody, TCJSFileSystemDelegat
     // MARK: - File System Delegate
 
     func context(context: JSContext, hasPermissionToReadFileAtPath path: String) -> Bool {
-        return (path as NSString).isSubpathOfPath(self.bundle.bundlePath)
+        return path == self.bundle.bundlePath || (path as NSString).isSubpathOfPath(self.bundle.bundlePath)
     }
 
     // MARK: - Test Body
@@ -56,10 +56,22 @@ class FileSystemTests: JSBridgeTests, FileSystemTestsBody, TCJSFileSystemDelegat
         self.context.evaluateScript("var exists1 = false, exists2 = false;")
         self.context.evaluateScript("fs.exists('\(requireJS1Path)', function(exists) { exists1 = exists; });")
         self.context.evaluateScript("fs.exists('\(requireJS2Path)', function(exists) { exists2 = exists; });")
-        after(1) {
+        after(0.25) {
             XCTAssertTrue(self.context.globalObject.valueForProperty("exists1").toBool())
             XCTAssertFalse(self.context.globalObject.valueForProperty("exists2").toBool())
         }
+    }
+
+    func testIsDirectory() {
+        self.context.evaluateScript("var isDir = false;")
+        self.context.evaluateScript("fs.isDirectory('\(self.bundle.bundlePath)', function(i) { isDir = i; });")
+        after(0.25) {
+            XCTAssertTrue(self.context.globalObject.valueForProperty("isDir").toBool())
+        }
+        XCTAssertTrue(self.context.evaluateScript("fs.isDirectorySync('\(self.bundle.bundlePath)');").toBool())
+
+        let requireJSPath = (self.bundle.bundlePath as NSString).stringByAppendingPathComponent("RequireTests.js")
+        XCTAssertFalse(self.context.evaluateScript("fs.isDirectorySync('\(requireJSPath)');").toBool())
     }
 
 }

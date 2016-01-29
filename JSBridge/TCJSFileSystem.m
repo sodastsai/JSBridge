@@ -19,6 +19,7 @@
 
 #import "TCJSFileSystem.h"
 #import <BenzeneFoundation/BenzeneFoundation.h>
+#import "TCJSDispatch.h"
 
 @implementation TCJSFileSystem
 
@@ -70,15 +71,22 @@
 }
 
 - (void)exists:(NSString *)path callback:(JSValue *)callback {
-    JSContext *context = [JSContext currentContext];
-    dispatch_async(TCJSJavaScriptContextGetBackgroundDispatchQueue(context), ^{
-        BOOL exists = [[TCJSFileSystem defaultFileSystem] existsSync:path];
-        dispatch_async(TCJSJavaScriptContextGetMainDispatchQueue(context), ^{
-            if (!callback.isUndefined) {
-                [callback callWithArguments:@[@(exists)]];
-            }
-        });
-    });
+    [TCJSDispatchManager asyncExecute:^NSArray * _Nonnull{
+        return @[@([self existsSync:path])];
+    } callback:callback];
+}
+
+- (BOOL)isDirectorySync:(NSString *)path {
+    BOOL isDirectory;
+    return ([self hasPermissionToReadFileAtPath:path] &&
+            [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory] &&
+            isDirectory);
+}
+
+- (void)isDirectory:(NSString *)path callback:(JSValue *)callback {
+    [TCJSDispatchManager asyncExecute:^NSArray * _Nonnull{
+        return @[@([self isDirectorySync:path])];
+    } callback:callback];
 }
 
 @end
