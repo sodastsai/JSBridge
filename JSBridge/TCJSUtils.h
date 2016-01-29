@@ -27,6 +27,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)format;
 + (NSString *)inspect:(JSValue *)object;
 
++ (NSString *)toString:(JSValue *)obj;
++ (BOOL)isFunction:(JSValue *)obj;
++ (BOOL)isArray:(JSValue *)obj;
++ (BOOL)isDate:(JSValue *)obj;
++ (BOOL)isError:(JSValue *)obj;
++ (BOOL)isRegExp:(JSValue *)obj;
+
 @end
 
 NS_ASSUME_NONNULL_END

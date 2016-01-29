@@ -72,6 +72,7 @@ interface Util {
     isNumber(obj: any): boolean;
     isString(obj: any): boolean;
     isObject(obj: any): boolean;
+    isFunction(obj: any): boolean;
 
     format(...formats: any[]): string;  // node's format function (`util.format`)
     inspect(obj: any): string;  // node's inspect function (`util.inspect`)

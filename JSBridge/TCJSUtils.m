@@ -25,8 +25,10 @@
 
 + (void)load {
     [TCJSModule registerGlobalModuleNamed:@"util" withBlock:^TCJSModule *(JSContext *context) {
-        NSString *jsImplPath = [[NSBundle bundleForClass:TCJSUtil.class] pathForResource:@"TCJSUtils" ofType:@"js"];
-        TCJSModule *module = [[TCJSModule alloc] initWithScriptContentsOfFile:jsImplPath];
+        TCJSModule *module = [[TCJSModule alloc] init];
+        module.exports[@"toString"] = ^(JSValue *obj) {
+            return [TCJSUtil toString:obj];
+        };
         module.exports[@"isUndefined"] = ^(JSValue *value) {
             return value.isUndefined;
         };
@@ -48,25 +50,64 @@
         module.exports[@"isObject"] = ^(JSValue *value) {
             return value.isObject;
         };
+        module.exports[@"isFunction"] = ^(JSValue *value) {
+            return [TCJSUtil isFunction:value];
+        };
+        module.exports[@"isError"] = ^(JSValue *value) {
+            return [TCJSUtil isError:value];
+        };
+        module.exports[@"isRegExp"] = ^(JSValue *value) {
+            return [TCJSUtil isRegExp:value];
+        };
+        module.exports[@"isArray"] = ^(JSValue *value) {
+            return [value respondsToSelector:@selector(isArray)] ? value.isArray : [TCJSUtil isArray:value];
+        };
+        module.exports[@"isDate"] = ^(JSValue *value) {
+            return [value respondsToSelector:@selector(isDate)] ? value.isDate : [TCJSUtil isDate:value];
+        };
         module.exports[@"format"] = ^NSString *() {
             return [TCJSUtil format];
         };
         module.exports[@"inspect"] = ^NSString *(JSValue *jsValue) {
             return [TCJSUtil inspect:jsValue];
         };
-        if ([module.exports respondsToSelector:@selector(isArray)]) {
-            module.exports[@"isArray"] = ^(JSValue *value) {
-                return value.isArray;
-            };
-        }
-        if ([module.exports respondsToSelector:@selector(isDate)]) {
-            module.exports[@"isDate"] = ^(JSValue *value) {
-                return value.isDate;
-            };
-        }
 
         return module;
     }];
+}
+
++ (NSString *)toString:(JSValue *)obj {
+    JSContext *context = [JSContext currentContext];
+    return [[context evaluateScript:
+             @"(function() {\n"
+             @"    return function(obj) {\n"
+             @"        return Object.prototype.toString.call(obj);\n"
+             @"    };\n"
+             @"})();"] callWithArguments:@[obj]].toString;
+}
+
++ (BOOL)isFunction:(JSValue *)obj {
+    return [[self toString:obj] isEqualToString:@"[object Function]"];
+}
+
++ (BOOL)isArray:(JSValue *)obj {
+    return ([obj respondsToSelector:@selector(isArray)] ?
+            obj.isArray :
+            [[self toString:obj] isEqualToString:@"[object Array]"]);
+}
+
++ (BOOL)isDate:(JSValue *)obj {
+    return ([obj respondsToSelector:@selector(isDate)] ?
+            obj.isDate :
+            [[self toString:obj] isEqualToString:@"[object Date]"]);
+}
+
++ (BOOL)isError:(JSValue *)obj {
+    return [[self toString:obj] isEqualToString:@"[object Error]"];
+}
+
++ (BOOL)isRegExp:(JSValue *)obj {
+    return [[self toString:obj] isEqualToString:@"[object RegExp]"];
 }
 
 + (NSString *)format {

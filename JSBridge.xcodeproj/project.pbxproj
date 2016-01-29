@@ -40,7 +40,6 @@
 		FEB7EE851C59BAC500B0D44E /* TCJSModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSModule.m; sourceTree = "<group>"; };
 		FEB7EE871C59BE6B00B0D44E /* TCJSUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSUtils.h; sourceTree = "<group>"; };
 		FEB7EE881C59BE6B00B0D44E /* TCJSUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSUtils.m; sourceTree = "<group>"; };
-		FEB7EE8A1C59BF8B00B0D44E /* TCJSUtils.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = TCJSUtils.js; sourceTree = "<group>"; };
 		FEB7EE981C59C52600B0D44E /* TCJSApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSApplication.h; sourceTree = "<group>"; };
 		FEB7EE991C59C52600B0D44E /* TCJSApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSApplication.m; sourceTree = "<group>"; };
 		FEB7EE9B1C59C85F00B0D44E /* TCJSConsole.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSConsole.h; sourceTree = "<group>"; };
@@ -97,7 +96,6 @@
 				FEB7EE881C59BE6B00B0D44E /* TCJSUtils.m */,
 				FEB7EEB21C5A0EDF00B0D44E /* TCJSFileSystem.h */,
 				FEB7EEB31C5A0EDF00B0D44E /* TCJSFileSystem.m */,
-				FEB7EE8A1C59BF8B00B0D44E /* TCJSUtils.js */,
 				FEB7EEB91C5A1C8200B0D44E /* TCJSExtraModules.m */,
 				FEB7EEB71C5A1C6000B0D44E /* TCJS_underscore_1.8.3.js */,
 				FEB7EEBD1C5B091200B0D44E /* TCJS_q_1.4.1.js */,

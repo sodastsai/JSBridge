@@ -59,6 +59,12 @@ class UtilsTests: JSBridgeTests {
         XCTAssertTrue(self.context.evaluateScript("util.isDate(swiftDate);").toBool())
     }
 
+    func testIsFunction() {
+        XCTAssertFalse(self.context.evaluateScript("util.isFunction('util');").toBool())
+        XCTAssertTrue(self.context.evaluateScript("util.isFunction(function() {});").toBool())
+        XCTAssertTrue(self.context.evaluateScript("function add() {}; util.isFunction(add);").toBool())
+    }
+
     func testIsError() {
         XCTAssertTrue(self.context.evaluateScript("util.isError(new Error());").toBool())
         XCTAssertFalse(self.context.evaluateScript("util.isError(42);").toBool())
