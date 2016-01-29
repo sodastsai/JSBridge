@@ -80,6 +80,8 @@ interface IUtil {  // This interface is used for the exports of `require('util')
 // DataBuffer ----------------------------------------------------------------------------------------------------------
 declare namespace DataBuffer {
     function create(length?: number): IDataBuffer
+    function fromHexString(hexString: string): IDataBuffer;
+    function fromByteArray(byteArray: number[]): IDataBuffer;
 
     interface IDataBuffer {
         length: number;
@@ -89,7 +91,13 @@ declare namespace DataBuffer {
         byte(index: number, value: number);  // Set a byte at index by number (0-255)
         byte(index: number, value: string);  // Set a byte at index by hex string ('0'-'ff')
 
-        hexDigest: string;  // Get hex string representation of this buffer
+        hexString: string;  // Get hex string representation of this buffer
+
+        equal(dataBuffer: IDataBuffer): boolean;  // Compare the content instead of the object itself
+
+        append(dataBuffer: IDataBuffer);
+        subDataBuffer(start: number, length: number): IDataBuffer;  // Get subset of data buffer
+        copyAsNewDataBuffer(): IDataBuffer;
     }
 }
 

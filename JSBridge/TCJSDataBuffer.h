@@ -23,14 +23,23 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class TCJSDataBuffer;
+
 @protocol TCJSDataBuffer <JSExport>
 
 + (instancetype)create;
++ (instancetype)fromHexString:(NSString *)string;
++ (instancetype)fromByteArray:(NSArray<NSNumber *> *)bytes;
 
+JSExportAs(subDataBuffer, - (nullable instancetype)subDataBufferFrom:(NSUInteger)start length:(NSUInteger)length);
+- (instancetype)copyAsNewDataBuffer;
+
+// Content
 @property (nonatomic, readwrite) NSUInteger length;
+@property (nonatomic, readonly) NSString *hexString;
 - (JSValue *)byte;
-
-@property (nonatomic, readonly) NSString *hexDigest;
+- (void)append:(TCJSDataBuffer *)dataBuffer;
+- (BOOL)equal:(TCJSDataBuffer *)dataBuffer;
 
 @end
 
@@ -38,7 +47,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readonly) NSMutableData *data;
 
-- (instancetype)initWithLength:(NSUInteger)length NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithLength:(NSUInteger)length;
+- (instancetype)initWithData:(NSMutableData *)data NS_DESIGNATED_INITIALIZER;
+
+- (BOOL)isEqualToDataBuffer:(TCJSDataBuffer *)dataBuffer;
 
 @end
 

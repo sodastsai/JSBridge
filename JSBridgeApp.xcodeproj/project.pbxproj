@@ -24,6 +24,7 @@
 		FEB7EEB61C5A114700B0D44E /* FileSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEB51C5A114700B0D44E /* FileSystemTests.swift */; };
 		FEB7EEBC1C5A219000B0D44E /* ExtraModulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEBB1C5A219000B0D44E /* ExtraModulesTests.swift */; };
 		FEB7EEC51C5B49AF00B0D44E /* DispatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEC41C5B49AF00B0D44E /* DispatchTests.swift */; };
+		FEB7EECA1C5B996B00B0D44E /* DataBufferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEC91C5B996B00B0D44E /* DataBufferTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 		FEB7EEB51C5A114700B0D44E /* FileSystemTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileSystemTests.swift; sourceTree = "<group>"; };
 		FEB7EEBB1C5A219000B0D44E /* ExtraModulesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtraModulesTests.swift; sourceTree = "<group>"; };
 		FEB7EEC41C5B49AF00B0D44E /* DispatchTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchTests.swift; sourceTree = "<group>"; };
+		FEB7EEC91C5B996B00B0D44E /* DataBufferTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBufferTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +148,7 @@
 				FEB7EEB51C5A114700B0D44E /* FileSystemTests.swift */,
 				FEB7EEBB1C5A219000B0D44E /* ExtraModulesTests.swift */,
 				FEB7EEC41C5B49AF00B0D44E /* DispatchTests.swift */,
+				FEB7EEC91C5B996B00B0D44E /* DataBufferTests.swift */,
 				FEB7EE951C59C34100B0D44E /* Supporting Files */,
 			);
 			path = JSBridgeTests;
@@ -328,6 +331,7 @@
 				FEB7EEB61C5A114700B0D44E /* FileSystemTests.swift in Sources */,
 				FEB7EEA31C59C9EA00B0D44E /* ApplicationTests.swift in Sources */,
 				FEB7EE971C59C35700B0D44E /* UtilsTests.swift in Sources */,
+				FEB7EECA1C5B996B00B0D44E /* DataBufferTests.swift in Sources */,
 				FEB7EEBC1C5A219000B0D44E /* ExtraModulesTests.swift in Sources */,
 				FEB7EEA11C59C96C00B0D44E /* ConsoleTests.swift in Sources */,
 				FEB7EEC51C5B49AF00B0D44E /* DispatchTests.swift in Sources */,

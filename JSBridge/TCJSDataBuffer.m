@@ -36,6 +36,34 @@
     return [[TCJSDataBuffer alloc] initWithLength:arguments.firstObject.toNumber.unsignedIntegerValue];
 }
 
++ (instancetype)fromHexString:(NSString *)string {
+    NSData *inputData = [BFHash dataFromHexdigestString:string];
+    if (inputData) {
+        return [[TCJSDataBuffer alloc] initWithData:[inputData mutableCopy]];
+    } else {
+        return nil;
+    }
+}
+
++ (instancetype)fromByteArray:(NSArray<NSNumber *> *)bytes {
+    TCJSDataBuffer *dataBuffer = [[TCJSDataBuffer alloc] initWithLength:bytes.count];
+    uint8_t *dataBytes = (uint8_t *)dataBuffer.data.mutableBytes;
+
+    BOOL __block validValue = YES;
+    [bytes enumerateObjectsUsingBlock:^(NSNumber *byte, NSUInteger idx, BOOL *stop) {
+        if ((validValue = byte.integerValue < 256)) {
+            dataBytes[idx] = byte.charValue;
+        } else {
+            *stop = YES;
+        }
+    }];
+    if (validValue) {
+        return dataBuffer;
+    } else {
+        return nil;
+    }
+}
+
 #pragma mark - Object Lifecycle
 
 - (instancetype)init {
@@ -43,10 +71,26 @@
 }
 
 - (instancetype)initWithLength:(NSUInteger)length {
+    return self = [self initWithData:[NSMutableData dataWithLength:length]];
+}
+
+- (instancetype)initWithData:(NSMutableData *)data {
     if (self = [super init]) {
-        _data = [NSMutableData dataWithLength:length];
+        _data = data;
     }
     return self;
+}
+
+- (BOOL)isEqual:(id)object {
+    return [object isKindOfClass:TCJSDataBuffer.class] ? [self isEqualToDataBuffer:object] : NO;
+}
+
+- (BOOL)isEqualToDataBuffer:(TCJSDataBuffer *)dataBuffer {
+    return [self.data isEqualToData:dataBuffer.data];
+}
+
+- (NSUInteger)hash {
+    return self.data.hash;
 }
 
 #pragma mark - Properties
@@ -117,8 +161,30 @@
     }
 }
 
-- (NSString *)hexDigest {
+- (NSString *)hexString {
     return [BFHash hexdigestStringFromData:self.data];
+}
+
+- (BOOL)equal:(TCJSDataBuffer *)dataBuffer {
+    return [self isEqual:dataBuffer];
+}
+
+- (void)append:(TCJSDataBuffer *)dataBuffer {
+    [self.data appendData:dataBuffer.data];
+}
+
+- (instancetype)subDataBufferFrom:(NSUInteger)start length:(NSUInteger)length {
+    if (start+length > self.data.length) {
+        NSString *message = BFFormatString(@"Out of bound. (0..%ld)", self.data.length-1);
+        [JSContext currentContext].exception = [JSValue valueWithNewErrorFromMessage:message
+                                                                           inContext:[JSContext currentContext]];
+        return nil;
+    }
+    return [[TCJSDataBuffer alloc] initWithData:[[self.data subdataWithRange:NSMakeRange(start, length)] mutableCopy]];
+}
+
+- (instancetype)copyAsNewDataBuffer {
+    return [self subDataBufferFrom:0 length:self.length];
 }
 
 @end
