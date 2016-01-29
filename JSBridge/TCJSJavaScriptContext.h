@@ -44,4 +44,11 @@ TCJS_EXTERN void TCJSJavaScriptContextRegisterExtension(Class extension);
 
 TCJS_EXTERN JSContext *TCJSJavaScriptContextCreateContext();
 
+TCJS_EXTERN void TCJSJavaScriptContextSetMainDispatchQueue(JSContext *context,
+                                                           dispatch_queue_t _Nullable dispatchQueue);
+TCJS_EXTERN dispatch_queue_t _Nullable TCJSJavaScriptContextGetMainDispatchQueue(JSContext *context);
+TCJS_EXTERN void TCJSJavaScriptContextSetBackgroundDispatchQueue(JSContext *context,
+                                                                 dispatch_queue_t _Nullable dispatchQueue);
+TCJS_EXTERN dispatch_queue_t _Nullable TCJSJavaScriptContextGetBackgroundDispatchQueue(JSContext *context);
+
 NS_ASSUME_NONNULL_END

@@ -18,6 +18,7 @@
 //
 
 #import "TCJSJavaScriptContext.h"
+#import <objc/runtime.h>
 
 TCJS_EXTERN NSMutableSet<Class> *TCJSJavaScriptContextRegisteredExtensions() {
     static NSMutableSet *extensions;
@@ -45,4 +46,33 @@ TCJS_EXTERN JSContext *TCJSJavaScriptContextCreateContext() {
         [ExtClass loadExtensionForJSContext:context];
     }
     return context;
+}
+
+static char TCJSJavaScriptContextMainDispatchQueueAssociationKey;
+static char TCJSJavaScriptContextBackgroundDispatchQueueAssociationKey;
+
+TCJS_EXTERN void TCJSJavaScriptContextSetMainDispatchQueue(JSContext *context,
+                                                           dispatch_queue_t _Nullable dispatchQueue) {
+    objc_setAssociatedObject(context,
+                             &TCJSJavaScriptContextMainDispatchQueueAssociationKey,
+                             dispatchQueue,
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+TCJS_EXTERN dispatch_queue_t _Nullable TCJSJavaScriptContextGetMainDispatchQueue(JSContext *context) {
+    return (objc_getAssociatedObject(context, &TCJSJavaScriptContextMainDispatchQueueAssociationKey) ?:
+            dispatch_get_main_queue());
+}
+
+TCJS_EXTERN void TCJSJavaScriptContextSetBackgroundDispatchQueue(JSContext *context,
+                                                                 dispatch_queue_t _Nullable dispatchQueue) {
+    objc_setAssociatedObject(context,
+                             &TCJSJavaScriptContextBackgroundDispatchQueueAssociationKey,
+                             dispatchQueue,
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+TCJS_EXTERN dispatch_queue_t _Nullable TCJSJavaScriptContextGetBackgroundDispatchQueue(JSContext *context) {
+    return (objc_getAssociatedObject(context, &TCJSJavaScriptContextBackgroundDispatchQueueAssociationKey) ?:
+            dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
 }
