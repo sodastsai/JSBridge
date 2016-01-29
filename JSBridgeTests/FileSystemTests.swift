@@ -74,6 +74,21 @@ class FileSystemTests: JSBridgeTests, FileSystemTestsBody, TCJSFileSystemDelegat
         XCTAssertFalse(self.context.evaluateScript("fs.isDirectorySync('\(requireJSPath)');").toBool())
     }
 
+    func testReadFile() {
+        let expectation = self.expectationWithDescription("read file")
+        let block: @convention(block) (JSValue, JSValue) -> Void = { (dataBufferValue, errorValue) in
+            XCTAssertTrue(errorValue.isNull)
+            let dataBuffer = dataBufferValue.toObjectOfClass(TCJSDataBuffer) as! TCJSDataBuffer
+            XCTAssertEqual(dataBuffer.data,
+                ("JSBridge" as NSString).dataUsingEncoding(NSUTF8StringEncoding)?.mutableCopy() as? NSMutableData)
+            expectation.fulfill()
+        }
+        self.context.globalObject.setValue(unsafeBitCast(block, AnyObject.self), forProperty: "block")
+        let txtPath = self.bundle.pathForResource("jsbridge", ofType: "txt")!
+        self.context.evaluateScript("fs.readFile('\(txtPath)', function(data, err) { block(data, err); });")
+        self.waitForExpectationsWithTimeout(0.5, handler: nil)
+    }
+
 }
 
 class FileSystemWithoutDelegateTests: JSBridgeTests, FileSystemTestsBody {

@@ -32,6 +32,9 @@ JSExportAs(exists, - (void)exists:(NSString *)path callback:(JSValue *)callback)
 - (BOOL)isDirectorySync:(NSString *)path;
 JSExportAs(isDirectory, - (void)isDirectory:(NSString *)path callback:(JSValue *)callback);
 
+- (void)readFile;
+- (void)writeFile;
+
 @end
 
 @interface TCJSFileSystem : NSObject <TCJSFileSystem>

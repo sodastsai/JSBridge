@@ -27,7 +27,7 @@
     [TCJSModule registerGlobalModuleNamed:@"util" withBlock:^TCJSModule *(JSContext *context) {
         TCJSModule *module = [[TCJSModule alloc] init];
         module.exports[@"toString"] = ^(JSValue *obj) {
-            return [TCJSUtil toString:obj];
+            return [TCJSUtil toString:obj context:[JSContext currentContext]];
         };
         module.exports[@"isUndefined"] = ^(JSValue *value) {
             return value.isUndefined;
@@ -51,19 +51,23 @@
             return value.isObject;
         };
         module.exports[@"isFunction"] = ^(JSValue *value) {
-            return [TCJSUtil isFunction:value];
+            return [TCJSUtil isFunction:value context:[JSContext currentContext]];
         };
         module.exports[@"isError"] = ^(JSValue *value) {
-            return [TCJSUtil isError:value];
+            return [TCJSUtil isError:value context:[JSContext currentContext]];
         };
         module.exports[@"isRegExp"] = ^(JSValue *value) {
-            return [TCJSUtil isRegExp:value];
+            return [TCJSUtil isRegExp:value context:[JSContext currentContext]];
         };
         module.exports[@"isArray"] = ^(JSValue *value) {
-            return [value respondsToSelector:@selector(isArray)] ? value.isArray : [TCJSUtil isArray:value];
+            return ([value respondsToSelector:@selector(isArray)] ?
+                    value.isArray :
+                    [TCJSUtil isArray:value context:[JSContext currentContext]]);
         };
         module.exports[@"isDate"] = ^(JSValue *value) {
-            return [value respondsToSelector:@selector(isDate)] ? value.isDate : [TCJSUtil isDate:value];
+            return ([value respondsToSelector:@selector(isDate)] ?
+                    value.isDate :
+                    [TCJSUtil isDate:value context:[JSContext currentContext]]);
         };
         module.exports[@"format"] = ^NSString *() {
             return [TCJSUtil format];
@@ -76,8 +80,7 @@
     }];
 }
 
-+ (NSString *)toString:(JSValue *)obj {
-    JSContext *context = [JSContext currentContext];
++ (NSString *)toString:(JSValue *)obj context:(nonnull JSContext *)context {
     return [[context evaluateScript:
              @"(function() {\n"
              @"    return function(obj) {\n"
@@ -86,28 +89,28 @@
              @"})();"] callWithArguments:@[obj]].toString;
 }
 
-+ (BOOL)isFunction:(JSValue *)obj {
-    return [[self toString:obj] isEqualToString:@"[object Function]"];
++ (BOOL)isFunction:(JSValue *)obj context:(nonnull JSContext *)context {
+    return [[self toString:obj context:context] isEqualToString:@"[object Function]"];
 }
 
-+ (BOOL)isArray:(JSValue *)obj {
++ (BOOL)isArray:(JSValue *)obj context:(nonnull JSContext *)context {
     return ([obj respondsToSelector:@selector(isArray)] ?
             obj.isArray :
-            [[self toString:obj] isEqualToString:@"[object Array]"]);
+            [[self toString:obj context:context] isEqualToString:@"[object Array]"]);
 }
 
-+ (BOOL)isDate:(JSValue *)obj {
++ (BOOL)isDate:(JSValue *)obj context:(nonnull JSContext *)context {
     return ([obj respondsToSelector:@selector(isDate)] ?
             obj.isDate :
-            [[self toString:obj] isEqualToString:@"[object Date]"]);
+            [[self toString:obj context:context] isEqualToString:@"[object Date]"]);
 }
 
-+ (BOOL)isError:(JSValue *)obj {
-    return [[self toString:obj] isEqualToString:@"[object Error]"];
++ (BOOL)isError:(JSValue *)obj context:(nonnull JSContext *)context {
+    return [[self toString:obj context:context] isEqualToString:@"[object Error]"];
 }
 
-+ (BOOL)isRegExp:(JSValue *)obj {
-    return [[self toString:obj] isEqualToString:@"[object RegExp]"];
++ (BOOL)isRegExp:(JSValue *)obj context:(nonnull JSContext *)context {
+    return [[self toString:obj context:context] isEqualToString:@"[object RegExp]"];
 }
 
 + (NSString *)format {

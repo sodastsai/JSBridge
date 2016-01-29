@@ -101,7 +101,8 @@
     // Indexed operation ...
     // Get index
     if (!arguments[0].isNumber) {
-        NSString *message = BFFormatString(@"Got unexpected argument type %@ at 0", [TCJSUtil toString:arguments[0]]);
+        NSString *message = BFFormatString(@"Got unexpected argument type %@ at 0",
+                                           [TCJSUtil toString:arguments[0] context:context]);
         context.exception = [JSValue valueWithNewErrorFromMessage:message inContext:context];
         return nil;
     }

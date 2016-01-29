@@ -20,6 +20,8 @@
 #import "TCJSFileSystem.h"
 #import <BenzeneFoundation/BenzeneFoundation.h>
 #import "TCJSDispatch.h"
+#import "TCJSUtils.h"
+#import "TCJSDataBuffer.h"
 
 @implementation TCJSFileSystem
 
@@ -71,7 +73,7 @@
 }
 
 - (void)exists:(NSString *)path callback:(JSValue *)callback {
-    [TCJSDispatchManager asyncExecute:^NSArray * _Nonnull{
+    [TCJSDispatchManager asyncExecute:^NSArray *(JSContext *context) {
         return @[@([self existsSync:path])];
     } callback:callback];
 }
@@ -84,9 +86,49 @@
 }
 
 - (void)isDirectory:(NSString *)path callback:(JSValue *)callback {
-    [TCJSDispatchManager asyncExecute:^NSArray * _Nonnull{
+    [TCJSDispatchManager asyncExecute:^NSArray *(JSContext *context) {
         return @[@([self isDirectorySync:path])];
     } callback:callback];
+}
+
+- (void)readFile {
+    JSContext *context = [JSContext currentContext];
+    NSArray<JSValue *> *arguments = [JSContext currentArguments];
+    JSValue *filenameValue;
+    JSValue *callback;
+    if (arguments.count == 1) {
+        filenameValue = arguments[0];
+    } else {
+        filenameValue = arguments[0];
+        callback = arguments[1];
+    }
+    if (!filenameValue.isString) {
+        context.exception = [JSValue valueWithNewErrorFromMessage:@"filename must be a string" inContext:context];
+        return;
+    }
+
+    NSString *filename = filenameValue.toString;
+    [TCJSDispatchManager asyncExecute:^NSArray *(JSContext *context) {
+        if ([self hasPermissionToReadFileAtPath:filename]) {
+            NSError *error;
+            NSData *data = [[NSData alloc] initWithContentsOfFile:filename options:0 error:&error];
+            if (data) {
+                TCJSDataBuffer *dataBuffer = [[TCJSDataBuffer alloc] initWithData:[data mutableCopy]];
+                return @[dataBuffer, [JSValue valueWithNullInContext:context]];
+            } else {
+                JSValue *errorValue = [JSValue valueWithNewErrorFromMessage:error.localizedDescription
+                                                                  inContext:context];
+                return @[[JSValue valueWithNullInContext:context], errorValue];
+            }
+        } else {
+            JSValue *error = [JSValue valueWithNewErrorFromMessage:@"Permission denied" inContext:context];
+            return @[[JSValue valueWithNullInContext:context], error];
+        }
+    } callback:callback];
+}
+
+- (void)writeFile {
+
 }
 
 @end

@@ -48,12 +48,12 @@ NSString *const TCJSDispatchManagerBackgroundQueueName = @"TCJSDispatchManagerBa
     return sharedManager;
 }
 
-+ (void)asyncExecute:(NSArray *(^)(void))block callback:(JSValue *)callback {
++ (void)asyncExecute:(NSArray *(^)(JSContext *))block callback:(JSValue *)callback {
     JSContext *context = [JSContext currentContext];
     dispatch_async(TCJSJavaScriptContextGetBackgroundDispatchQueue(context), ^{
-        NSArray *arguments = block();
+        NSArray *arguments = block(context);
         dispatch_async(TCJSJavaScriptContextGetMainDispatchQueue(context), ^{
-            if (!callback.isUndefined) {
+            if ([TCJSUtil isFunction:callback context:context]) {
                 [callback callWithArguments:arguments];
             }
         });
@@ -110,7 +110,7 @@ typedef BFPair<dispatch_queue_t, dispatch_block_t> TCJSDispatchPair;
     } else if (arguments.count == 1) {
         // Expect Arguments: [func]
         JSValue *function = arguments[0];
-        if ([TCJSUtil isFunction:function]) {
+        if ([TCJSUtil isFunction:function context:context]) {
             return [TCJSDispatchPair pairWithObject:_defaultQueue andObject:^{
                 [function callWithArguments:@[]];
             }];
@@ -121,7 +121,7 @@ typedef BFPair<dispatch_queue_t, dispatch_block_t> TCJSDispatchPair;
     } else {
         dispatch_queue_t queue;
         dispatch_block_t block;
-        if (arguments[0].isString && [TCJSUtil isFunction:arguments[1]]) {
+        if (arguments[0].isString && [TCJSUtil isFunction:arguments[1] context:context]) {
             // Expect Arguments: [str, func, ....]
             queue = [self dispatchQueueFromQueueName:arguments[0].toString];
             if (!queue) {
@@ -132,17 +132,16 @@ typedef BFPair<dispatch_queue_t, dispatch_block_t> TCJSDispatchPair;
             block = ^{
                 [arguments[1] callWithArguments:[arguments subarrayFromIndex:2]];
             };
-        } else if ([TCJSUtil isFunction:arguments[0]]) {
+        } else if ([TCJSUtil isFunction:arguments[0] context:context]) {
             // Expect Arguments: [func, ....]
             queue = _defaultQueue;
             block = ^{
                 [arguments[0] callWithArguments:[arguments subarrayFromIndex:1]];
             };
         } else {
-            context.exception = [JSValue
-                                 valueWithNewErrorFromMessage:BFFormatString(@"Unexcepted argument type %@ at 0",
-                                                                             [TCJSUtil toString:arguments[0]])
-                                 inContext:context];
+            NSString *message = BFFormatString(@"Unexcepted argument type %@ at 0",
+                                               [TCJSUtil toString:arguments[0] context:context]);
+            context.exception = [JSValue valueWithNewErrorFromMessage:message inContext:context];
             return nil;
         }
         return [TCJSDispatchPair pairWithObject:queue andObject:block];

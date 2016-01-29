@@ -27,12 +27,12 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)format;
 + (NSString *)inspect:(JSValue *)object;
 
-+ (NSString *)toString:(JSValue *)obj;
-+ (BOOL)isFunction:(JSValue *)obj;
-+ (BOOL)isArray:(JSValue *)obj;
-+ (BOOL)isDate:(JSValue *)obj;
-+ (BOOL)isError:(JSValue *)obj;
-+ (BOOL)isRegExp:(JSValue *)obj;
++ (NSString *)toString:(JSValue *)obj context:(JSContext *)context;
++ (BOOL)isFunction:(JSValue *)obj context:(JSContext *)context;
++ (BOOL)isArray:(JSValue *)obj context:(JSContext *)context;
++ (BOOL)isDate:(JSValue *)obj context:(JSContext *)context;
++ (BOOL)isError:(JSValue *)obj context:(JSContext *)context;
++ (BOOL)isRegExp:(JSValue *)obj context:(JSContext *)context;
 
 @end
 

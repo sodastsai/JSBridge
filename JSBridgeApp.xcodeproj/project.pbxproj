@@ -25,6 +25,7 @@
 		FEB7EEBC1C5A219000B0D44E /* ExtraModulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEBB1C5A219000B0D44E /* ExtraModulesTests.swift */; };
 		FEB7EEC51C5B49AF00B0D44E /* DispatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEC41C5B49AF00B0D44E /* DispatchTests.swift */; };
 		FEB7EECA1C5B996B00B0D44E /* DataBufferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEC91C5B996B00B0D44E /* DataBufferTests.swift */; };
+		FEB7EECC1C5BBB5500B0D44E /* jsbridge.txt in Resources */ = {isa = PBXBuildFile; fileRef = FEB7EECB1C5BBB5500B0D44E /* jsbridge.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,7 @@
 		FEB7EEBB1C5A219000B0D44E /* ExtraModulesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtraModulesTests.swift; sourceTree = "<group>"; };
 		FEB7EEC41C5B49AF00B0D44E /* DispatchTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchTests.swift; sourceTree = "<group>"; };
 		FEB7EEC91C5B996B00B0D44E /* DataBufferTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBufferTests.swift; sourceTree = "<group>"; };
+		FEB7EECB1C5BBB5500B0D44E /* jsbridge.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = jsbridge.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +148,7 @@
 				FEB7EEA21C59C9EA00B0D44E /* ApplicationTests.swift */,
 				FEB7EEAD1C5A03DD00B0D44E /* TimerTests.swift */,
 				FEB7EEB51C5A114700B0D44E /* FileSystemTests.swift */,
+				FEB7EECB1C5BBB5500B0D44E /* jsbridge.txt */,
 				FEB7EEBB1C5A219000B0D44E /* ExtraModulesTests.swift */,
 				FEB7EEC41C5B49AF00B0D44E /* DispatchTests.swift */,
 				FEB7EEC91C5B996B00B0D44E /* DataBufferTests.swift */,
@@ -259,6 +262,7 @@
 			files = (
 				FEB7EE921C59C16C00B0D44E /* RequireTests.js in Resources */,
 				FEB7EE941C59C17500B0D44E /* RequireTests2.js in Resources */,
+				FEB7EECC1C5BBB5500B0D44E /* jsbridge.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

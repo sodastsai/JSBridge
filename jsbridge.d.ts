@@ -108,6 +108,9 @@ declare namespace DataBuffer {
 
 
 // fs ------------------------------------------------------------------------------------------------------------------
+interface IFsReadFileCallback { (data: DataBuffer.IDataBuffer, err: Error): void; }
+interface IFsWriteFileCallback { (err: Error): void; }
+interface IFsReadWriteFileOptions { encoding?: string; flag?: string; }
 interface IFs {  // This interface is used for the exports of `require('fs');`
 
     existsSync(path: string): boolean;
@@ -115,6 +118,12 @@ interface IFs {  // This interface is used for the exports of `require('fs');`
 
     isDirectorySync(path: string): boolean;
     isDirectory(path: string, callback?: (exist: boolean) => void);
+
+    readFile(filename: string, callback?: IFsReadFileCallback);
+
+    writeFile(filename: string, data: DataBuffer.IDataBuffer, callback?: IFsWriteFileCallback);
+    writeFile(filename: string, data: DataBuffer.IDataBuffer, options: string, callback?: IFsWriteFileCallback);
+    writeFile(f: string, data: DataBuffer.IDataBuffer, options: IFsReadWriteFileOptions, cb?: IFsWriteFileCallback);
 }
 
 
