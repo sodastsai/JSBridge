@@ -157,10 +157,11 @@
                 } else {
                     scriptLoader = [context evaluateScript:paddedScript];
                 }
+                @weakify(self);
                 [scriptLoader callWithArguments:@[
                     self,
                     self.exports,
-                    ^JSValue *(NSString *path){ return [self require:path]; },
+                    ^JSValue *(NSString *path){ @strongify(self); return [self require:path]; },
                 ]];
                 if (!(_loaded = context.exception == nil)) {
                     return self = nil;
