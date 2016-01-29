@@ -23,3 +23,4 @@
 #import <TCJSBridge/TCJSApplication.h>
 #import <TCJSBridge/TCJSConsole.h>
 #import <TCJSBridge/TCJSFileSystem.h>
+#import <TCJSBridge/TCJSDispatch.h>

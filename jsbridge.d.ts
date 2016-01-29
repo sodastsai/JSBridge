@@ -23,6 +23,7 @@ declare const require: RequireFunc;  // Import/Load other scripts in.
  *
  * * `util`: see `Util`.
  * * `fs`: see `FS`.
+ * * `dispatch`: see `Dispatch`.
  * * `underscore`: Check underscore.js 1.8.3 (External, from http://underscorejs.org)
  * * `q`: Check q.js 1.4.1 (External, from https://github.com/kriskowal/q)
  */
@@ -85,4 +86,27 @@ interface FS {
 
     existsSync(path: string): boolean;
     exists(path: string, callback?: (exist: boolean) => void);
+}
+
+
+// dispatch ------------------------------------------------------------------------------------------------------------
+interface Dispatch {
+    // This interface is used for the exports of `require('dispatch');`
+
+    /* queue names */
+    // Readonly, used to render iOS UI (the `dispatch_get_main_queue()` in iOS)
+    // May not be available due to context setting
+    uiQueue?: string;
+    // Readonly, used to perform IO task (the `DISPATCH_QUEUE_PRIORITY_BACKGROUND` in iOS)
+    ioQueue: string;
+    // Readonly, used to perform main JavaScript task.
+    // (by context settings, default is `dispatch_get_main_queue()`)
+    mainQueue: string;
+    // Readonly, used to perform non-blocking JavaScript task.
+    // (by context settings, default is `DISPATCH_QUEUE_PRIORITY_DEFAULT`)
+    backgroundQueue: string;
+
+    /* Note that the `queueName` argument should pass one of above queues */
+    async(queueName: string, block: () => void, ...arguments: any[]);
+    async(block: () => void, ...arguments: any[]);
 }
