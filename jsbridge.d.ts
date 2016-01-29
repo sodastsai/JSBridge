@@ -24,6 +24,7 @@ declare const require: RequireFunc;  // Import/Load other scripts in.
  * * `util`: see `Util`.
  * * `fs`: see `FS`.
  * * `underscore`: Check underscore.js 1.8.3 (External, from http://underscorejs.org)
+ * * `q`: Check q.js 1.4.1 (External, from https://github.com/kriskowal/q)
  */
 
 

@@ -28,9 +28,14 @@
 
 + (void)load {
     [TCJSModule registerGlobalModuleNamed:@"underscore" withBlock:^TCJSModule * _Nonnull{
-        NSString *underscorePath = [[NSBundle bundleForClass:TCJSExtraModules.class]
-                                    pathForResource:@"TCJS_underscore_1.8.3" ofType:@"js"];
-        return [[TCJSModule alloc] initWithScriptContentsOfFile:underscorePath];
+        return [[TCJSModule alloc]
+                initWithScriptContentsOfFile:[[NSBundle bundleForClass:TCJSExtraModules.class]
+                                              pathForResource:@"TCJS_underscore_1.8.3" ofType:@"js"]];
+    }];
+
+    [TCJSModule registerGlobalModuleNamed:@"q" withBlock:^TCJSModule * _Nonnull{
+        return [[TCJSModule alloc] initWithScriptContentsOfFile:[[NSBundle bundleForClass:TCJSExtraModules.class]
+                                                                 pathForResource:@"TCJS_q_1.4.1" ofType:@"js"]];
     }];
 }
 
