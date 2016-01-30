@@ -40,7 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TCJSModule : NSObject <TCJSModule, TCJSJavaScriptContextExtension>
 
-+ (void)registerGlobalModuleNamed:(NSString *)globalModuleName withBlock:(TCJSModule *(^)(JSContext *context))block;
++ (void)registerGlobalModuleNamed:(NSString *)globalModuleName
+                        withBlock:(TCJSModule *_Nullable (^)(JSContext *context))block;
 
 + (nullable instancetype)mainModule;
 
