@@ -133,14 +133,36 @@ class DataBufferTests: JSBridgeTests {
         XCTAssertEqual(dataBuffer.data, NSMutableData(bytes: [0x01, 0x02, 0x05, 0x06, 0x07] as [UInt8], length: 5))
     }
 
-    func testInsert() {
+    func testInsert1() {
         let dataBuffer1 = TCJSDataBuffer(data: NSMutableData(bytes: [0x01, 0x04, 0x05, 0x06] as [UInt8], length: 4))
         let dataBuffer2 = TCJSDataBuffer(data: NSMutableData(bytes: [0x02, 0x03] as [UInt8], length: 2))
         self.context.globalObject.setValue(dataBuffer1, forProperty: "dataBuffer1")
         self.context.globalObject.setValue(dataBuffer2, forProperty: "dataBuffer2")
+
         self.context.evaluateScript("dataBuffer1.insert(dataBuffer2, 1);")
         XCTAssertEqual(dataBuffer1.data, NSMutableData(bytes: [0x01, 0x02, 0x03, 0x04, 0x05, 0x06] as [UInt8],
             length: 6))
+    }
+
+    func testInsert2() {
+        let dataBuffer1 = TCJSDataBuffer(data: NSMutableData(bytes: [0x01, 0x04, 0x05, 0x06] as [UInt8], length: 4))
+        let dataBuffer2 = TCJSDataBuffer(data: NSMutableData(bytes: [0x02, 0x03] as [UInt8], length: 2))
+        self.context.globalObject.setValue(dataBuffer1, forProperty: "dataBuffer1")
+        self.context.globalObject.setValue(dataBuffer2, forProperty: "dataBuffer2")
+
+        self.context.evaluateScript("dataBuffer1.insert(dataBuffer2, 3);")
+        XCTAssertEqual(dataBuffer1.data, NSMutableData(bytes: [0x01, 0x04, 0x05, 0x02, 0x03, 0x06] as [UInt8],
+            length: 6))
+    }
+
+    func testReplace() {
+        let dataBuffer1 = TCJSDataBuffer(data: NSMutableData(bytes: [0x01, 0x04, 0x05, 0x06] as [UInt8], length: 4))
+        let dataBuffer2 = TCJSDataBuffer(data: NSMutableData(bytes: [0x02, 0x03] as [UInt8], length: 2))
+        self.context.globalObject.setValue(dataBuffer1, forProperty: "dataBuffer1")
+        self.context.globalObject.setValue(dataBuffer2, forProperty: "dataBuffer2")
+
+        self.context.evaluateScript("dataBuffer1.replace(3, 1, dataBuffer2);")
+        XCTAssertEqual(dataBuffer1.data, NSMutableData(bytes: [0x01, 0x04, 0x05, 0x02] as [UInt8], length: 4))
     }
 
 }

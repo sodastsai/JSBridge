@@ -100,6 +100,7 @@ declare namespace DataBuffer {
         append(dataBuffer: IDataBuffer);
         delete(start: number, length: number);  // Remove bytes in range
         insert(dataBuffer: IDataBuffer, index: number);  // Insert data buffer at index
+        replace(start: number, length: number, dataBuffer: IDataBuffer);
 
         subDataBuffer(start: number, length: number): IDataBuffer;  // Get subset of data buffer
         copyAsNewDataBuffer(): IDataBuffer;

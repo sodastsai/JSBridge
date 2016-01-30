@@ -41,12 +41,19 @@ JSExportAs(subDataBuffer, - (nullable instancetype)subDataBufferFromIndex:(NSUIn
 - (void)append:(TCJSDataBuffer *)dataBuffer;
 JSExportAs(delete, - (void)deleteBytesFromIndex:(NSUInteger)start length:(NSUInteger)length);
 JSExportAs(insert, - (void)insertDataBuffer:(TCJSDataBuffer *)dataBuffer atIndex:(NSUInteger)index);
+JSExportAs(replace,
+- (void)replaceBytesFromIndex:(NSInteger)start length:(NSUInteger)length withDataBuffer:(TCJSDataBuffer *)dataBuffer);
 
 @end
 
 @interface TCJSDataBuffer () <TCJSDataBuffer, TCJSJavaScriptContextExtension>
 
 @end
+
+TCJS_STATIC_INLINE JSValue *TCJSDataBufferOutOfBoundError(NSUInteger lBound, NSUInteger uBound, JSContext *context) {
+    NSString *message = BFFormatString(@"Out of bound. (%ld..%ld)", (unsigned long)lBound, (unsigned long)uBound);
+    return [JSValue valueWithNewErrorFromMessage:message inContext:context];
+}
 
 @implementation TCJSDataBuffer
 
@@ -135,8 +142,7 @@ JSExportAs(insert, - (void)insertDataBuffer:(TCJSDataBuffer *)dataBuffer atIndex
     }
     NSUInteger idx = arguments[0].toNumber.unsignedIntegerValue;
     if (idx >= self.data.length) {
-        NSString *message = BFFormatString(@"Out of bound. (0..%ld)", self.data.length-1);
-        context.exception = [JSValue valueWithNewErrorFromMessage:message inContext:context];
+        context.exception = TCJSDataBufferOutOfBoundError(0, self.data.length-1, context);
         return nil;
     }
 
@@ -183,9 +189,8 @@ JSExportAs(insert, - (void)insertDataBuffer:(TCJSDataBuffer *)dataBuffer atIndex
 
 - (instancetype)subDataBufferFromIndex:(NSUInteger)start length:(NSUInteger)length {
     if (start+length > self.data.length) {
-        NSString *message = BFFormatString(@"Out of bound. (0..%ld)", self.data.length-1);
         JSContext *context = [JSContext currentContext];
-        context.exception = [JSValue valueWithNewErrorFromMessage:message inContext:context];
+        context.exception = TCJSDataBufferOutOfBoundError(0, self.data.length-1, context);
         return nil;
     }
     return [[TCJSDataBuffer alloc] initWithData:[[self.data subdataWithRange:NSMakeRange(start, length)] mutableCopy]];
@@ -197,9 +202,8 @@ JSExportAs(insert, - (void)insertDataBuffer:(TCJSDataBuffer *)dataBuffer atIndex
 
 - (void)deleteBytesFromIndex:(NSUInteger)start length:(NSUInteger)length {
     if (start+length > self.data.length) {
-        NSString *message = BFFormatString(@"Out of bound. (0..%ld)", self.data.length-1);
         JSContext *context = [JSContext currentContext];
-        context.exception = [JSValue valueWithNewErrorFromMessage:message inContext:context];
+        context.exception = TCJSDataBufferOutOfBoundError(0, self.data.length-1, context);
         return;
     }
 
@@ -208,12 +212,21 @@ JSExportAs(insert, - (void)insertDataBuffer:(TCJSDataBuffer *)dataBuffer atIndex
 
 - (void)insertDataBuffer:(TCJSDataBuffer *)dataBuffer atIndex:(NSUInteger)index {
     if (index >= self.data.length) {
-        NSString *message = BFFormatString(@"Out of bound. (0..%ld)", self.data.length-1);
         JSContext *context = [JSContext currentContext];
-        context.exception = [JSValue valueWithNewErrorFromMessage:message inContext:context];
+        context.exception = TCJSDataBufferOutOfBoundError(0, self.data.length-1, context);
         return;
     }
     [self.data replaceBytesInRange:NSMakeRange(index, 0) withBytes:dataBuffer.data.bytes length:dataBuffer.data.length];
+}
+
+- (void)replaceBytesFromIndex:(NSInteger)start length:(NSUInteger)length withDataBuffer:(TCJSDataBuffer *)dataBuffer {
+    if (start+length > self.data.length) {
+        JSContext *context = [JSContext currentContext];
+        context.exception = TCJSDataBufferOutOfBoundError(0, self.data.length-1, context);
+        return;
+    }
+    NSData *data = dataBuffer.data;
+    [self.data replaceBytesInRange:NSMakeRange(start, length) withBytes:data.bytes length:length];
 }
 
 @end
