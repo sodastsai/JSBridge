@@ -1,10 +1,7 @@
 PODS:
-  - BenzeneFoundation (0.5.40):
-    - BenzeneFoundation/Foundation (= 0.5.40)
-    - BenzeneFoundation/UIKit (= 0.5.40)
-  - BenzeneFoundation/Foundation (0.5.40):
+  - BenzeneFoundation/Foundation (0.5.41):
     - libextobjc (~> 0.4)
-  - BenzeneFoundation/UIKit (0.5.40):
+  - BenzeneFoundation/UIKit (0.5.41):
     - BenzeneFoundation/Foundation
     - libextobjc (~> 0.4)
   - libextobjc (0.4.1):
@@ -43,22 +40,19 @@ PODS:
   - libextobjc/RuntimeExtensions (0.4.1)
   - libextobjc/UmbrellaHeader (0.4.1)
   - TCJSBridge (0.0.1):
-    - BenzeneFoundation/UIKit (~> 0.5.40)
+    - BenzeneFoundation/UIKit (~> 0.5.41)
     - libextobjc
 
 DEPENDENCIES:
-  - BenzeneFoundation (from `/Users/sodas/Work/Wantoto/wantoto-kit`)
   - TCJSBridge (from `.`)
 
 EXTERNAL SOURCES:
-  BenzeneFoundation:
-    :path: "/Users/sodas/Work/Wantoto/wantoto-kit"
   TCJSBridge:
     :path: "."
 
 SPEC CHECKSUMS:
-  BenzeneFoundation: 30828f796de9770e0c87e525cb20bed32ce50e4f
+  BenzeneFoundation: acb3591714d945e87480b85f918c5e17a49e7cd1
   libextobjc: a650fc1bf489a3d3a9bc2e621efa3e1006fc5471
-  TCJSBridge: 1bca372f4a0908e41e257946ebfbfac843995e3d
+  TCJSBridge: 6933464625c962a319bc23a65f6debaf1ab89237
 
 COCOAPODS: 0.39.0
