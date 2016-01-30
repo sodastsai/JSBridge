@@ -20,10 +20,10 @@ declare const require: IRequireFunc;  // Import/Load other scripts in.
 
 /* Global Modules
  *
- * * `util`: see `Util`.
- * * `fs`: see `FS`.
- * * `dispatch`: see `Dispatch`.
- * * `events`: see `EventEmitter`
+ * * `util`: see `IUtil`.
+ * * `fs`: see `IFs`.
+ * * `dispatch`: see `IDispatch`.
+ * * `events`: see `NEvents`
  * * `underscore`: Check underscore.js 1.8.3 (External, from http://underscorejs.org)
  * * `q`: Check q.js 1.4.1 (External, from https://github.com/kriskowal/q)
  */
@@ -148,11 +148,11 @@ interface IDispatch {  // This interface is used for the exports of `require('di
 
 
 // Events --------------------------------------------------------------------------------------------------------------
-declare namespace EventEmitter {
+declare namespace NEvents {  // This namespace is used as the exports of `require('events');`
     interface IEventEmitterListener {
         (...args: any[]): void;
     }
-    export class EventEmitter {  // This class is used as the exports of `require('fs');`
+    export class EventEmitter {
         addEventListener(event: string, listener: IEventEmitterListener): EventEmitter;
         on(event: string, listener: IEventEmitterListener): EventEmitter;
         once(event: string, listener: IEventEmitterListener): EventEmitter;

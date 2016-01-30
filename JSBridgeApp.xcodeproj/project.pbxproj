@@ -26,6 +26,7 @@
 		FEB7EEC51C5B49AF00B0D44E /* DispatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEC41C5B49AF00B0D44E /* DispatchTests.swift */; };
 		FEB7EECA1C5B996B00B0D44E /* DataBufferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEC91C5B996B00B0D44E /* DataBufferTests.swift */; };
 		FEB7EECC1C5BBB5500B0D44E /* jsbridge.txt in Resources */ = {isa = PBXBuildFile; fileRef = FEB7EECB1C5BBB5500B0D44E /* jsbridge.txt */; };
+		FEB7EED01C5C6D7A00B0D44E /* EventEmitterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EECF1C5C6D7A00B0D44E /* EventEmitterTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +66,7 @@
 		FEB7EEC41C5B49AF00B0D44E /* DispatchTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchTests.swift; sourceTree = "<group>"; };
 		FEB7EEC91C5B996B00B0D44E /* DataBufferTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBufferTests.swift; sourceTree = "<group>"; };
 		FEB7EECB1C5BBB5500B0D44E /* jsbridge.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = jsbridge.txt; sourceTree = "<group>"; };
+		FEB7EECF1C5C6D7A00B0D44E /* EventEmitterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventEmitterTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,6 +154,7 @@
 				FEB7EEBB1C5A219000B0D44E /* ExtraModulesTests.swift */,
 				FEB7EEC41C5B49AF00B0D44E /* DispatchTests.swift */,
 				FEB7EEC91C5B996B00B0D44E /* DataBufferTests.swift */,
+				FEB7EECF1C5C6D7A00B0D44E /* EventEmitterTests.swift */,
 				FEB7EE951C59C34100B0D44E /* Supporting Files */,
 			);
 			path = JSBridgeTests;
@@ -331,6 +334,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FEB7EE7A1C59B7BD00B0D44E /* JSBridgeTests.swift in Sources */,
+				FEB7EED01C5C6D7A00B0D44E /* EventEmitterTests.swift in Sources */,
 				FEB7EE901C59C0B400B0D44E /* RequireTests.swift in Sources */,
 				FEB7EEB61C5A114700B0D44E /* FileSystemTests.swift in Sources */,
 				FEB7EEA31C59C9EA00B0D44E /* ApplicationTests.swift in Sources */,

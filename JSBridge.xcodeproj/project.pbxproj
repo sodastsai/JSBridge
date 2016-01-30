@@ -18,6 +18,7 @@
 		FEB7EEBA1C5A1C8200B0D44E /* TCJSExtraModules.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEB91C5A1C8200B0D44E /* TCJSExtraModules.m */; };
 		FEB7EEC01C5B2EB900B0D44E /* TCJSDispatch.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEBF1C5B2EB900B0D44E /* TCJSDispatch.m */; };
 		FEB7EEC81C5B595400B0D44E /* TCJSDataBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EEC71C5B595400B0D44E /* TCJSDataBuffer.m */; };
+		FEB7EED31C5C721400B0D44E /* TCJSEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EED21C5C721400B0D44E /* TCJSEvents.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -57,7 +58,8 @@
 		FEB7EEC61C5B595400B0D44E /* TCJSDataBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSDataBuffer.h; sourceTree = "<group>"; };
 		FEB7EEC71C5B595400B0D44E /* TCJSDataBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSDataBuffer.m; sourceTree = "<group>"; };
 		FEB7EECD1C5C4D9800B0D44E /* TCJSUtils.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = TCJSUtils.js; sourceTree = "<group>"; };
-		FEB7EECE1C5C5B0C00B0D44E /* TCJSEventEmitter.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = TCJSEventEmitter.js; sourceTree = "<group>"; };
+		FEB7EECE1C5C5B0C00B0D44E /* TCJSEvents.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = TCJSEvents.js; sourceTree = "<group>"; };
+		FEB7EED21C5C721400B0D44E /* TCJSEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSEvents.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,9 +112,10 @@
 				FEB7EEC11C5B487100B0D44E /* TCJSDispatch.h */,
 				FEB7EEBF1C5B2EB900B0D44E /* TCJSDispatch.m */,
 				FEB7EEB91C5A1C8200B0D44E /* TCJSExtraModules.m */,
+				FEB7EED21C5C721400B0D44E /* TCJSEvents.m */,
 				FEB7EEB71C5A1C6000B0D44E /* TCJS_underscore_1.8.3.js */,
 				FEB7EEBD1C5B091200B0D44E /* TCJS_q_1.4.1.js */,
-				FEB7EECE1C5C5B0C00B0D44E /* TCJSEventEmitter.js */,
+				FEB7EECE1C5C5B0C00B0D44E /* TCJSEvents.js */,
 			);
 			path = JSBridge;
 			sourceTree = "<group>";
@@ -176,6 +179,7 @@
 			files = (
 				FEB7EE9A1C59C52600B0D44E /* TCJSApplication.m in Sources */,
 				FEB7EE891C59BE6B00B0D44E /* TCJSUtils.m in Sources */,
+				FEB7EED31C5C721400B0D44E /* TCJSEvents.m in Sources */,
 				FEB7EE831C59B95900B0D44E /* TCJSJavaScriptContext.m in Sources */,
 				FEB7EEB41C5A0EDF00B0D44E /* TCJSFileSystem.m in Sources */,
 				FEB7EEA61C59E7C600B0D44E /* TCJSTimer.m in Sources */,
