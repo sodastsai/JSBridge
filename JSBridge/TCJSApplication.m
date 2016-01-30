@@ -27,6 +27,7 @@
 @property (nonatomic, readonly) NSString *version;
 @property (nonatomic, readonly) NSString *build;
 @property (nonatomic, readonly) NSString *identifier;
+@property (nonatomic, readonly) NSString *name;
 
 @property (nonatomic, readonly) NSString *locale;
 @property (nonatomic, readonly) NSArray<NSString *> *preferredLanguages;
@@ -68,11 +69,15 @@
 }
 
 - (NSString *)version {
-    return [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"];
+    return [NSBundle mainBundle].infoDictionary[@"CFBundleShortVersionString"];
+}
+
+- (NSString *)name {
+    return [NSBundle mainBundle].infoDictionary[@"CFBundleDisplayName"];
 }
 
 - (NSString *)build {
-    return [[NSBundle mainBundle] infoDictionary][(__bridge NSString *)kCFBundleVersionKey];
+    return [NSBundle mainBundle].infoDictionary[(__bridge NSString *)kCFBundleVersionKey];
 }
 
 - (NSString *)identifier {
