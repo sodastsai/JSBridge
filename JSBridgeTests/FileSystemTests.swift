@@ -26,17 +26,41 @@ protocol FileSystemTestsBody {
 }
 
 class FileSystemTests: JSBridgeTests, FileSystemTestsBody, TCJSFileSystemDelegate {
+
+    var temporaryDirPath: String!
     
     override func setUp() {
         super.setUp()
+
+        self.temporaryDirPath = NSFileManager.defaultManager().pathOfUniqueTemporaryFolder
+        if !NSFileManager.defaultManager().fileExistsAtPath(self.temporaryDirPath) {
+            try! NSFileManager.defaultManager().createDirectoryAtPath(self.temporaryDirPath,
+                withIntermediateDirectories: true, attributes: nil)
+        }
+
         self.context.evaluateScript("var fs = require('fs');")
         TCJSFileSystem.defaultFileSystem().delegate = self
+    }
+
+    override func tearDown() {
+        super.tearDown()
+        self.temporaryDirPath = nil
     }
 
     // MARK: - File System Delegate
 
     func context(context: JSContext, hasPermissionToReadFileAtPath path: String) -> Bool {
-        return path == self.bundle.bundlePath || (path as NSString).isSubpathOfPath(self.bundle.bundlePath)
+        let pathString = path as NSString
+        return path == self.bundle.bundlePath ||
+            pathString.isSubpathOfPath(self.bundle.bundlePath) || pathString.isSubpathOfPath(self.temporaryDirPath)
+    }
+
+    func context(context: JSContext, hasPermissionToWriteFileAtPath path: String) -> Bool {
+        return (path as NSString).isSubpathOfPath(self.temporaryDirPath)
+    }
+
+    func context(context: JSContext, hasPermissionToDeleteFileAtPath path: String) -> Bool {
+        return (path as NSString).isSubpathOfPath(self.temporaryDirPath)
     }
 
     // MARK: - Test Body
@@ -84,8 +108,27 @@ class FileSystemTests: JSBridgeTests, FileSystemTestsBody, TCJSFileSystemDelegat
             expectation.fulfill()
         }
         self.context.globalObject.setValue(unsafeBitCast(block, AnyObject.self), forProperty: "block")
+
         let txtPath = self.bundle.pathForResource("jsbridge", ofType: "txt")!
         self.context.evaluateScript("fs.readFile('\(txtPath)', function(data, err) { block(data, err); });")
+        self.waitForExpectationsWithTimeout(0.5, handler: nil)
+    }
+
+    func testWriteFile() {
+        let dataBuffer = TCJSDataBuffer(data: NSData(hexString: "01027fff")!.mutableCopy() as! NSMutableData)
+        self.context.globalObject.setValue(dataBuffer, forProperty: "dataBuffer")
+
+        let filePath = (self.temporaryDirPath as NSString).stringByAppendingPathComponent("data")
+
+        let expectation = self.expectationWithDescription("read file")
+        let block: @convention(block) (JSValue) -> Void = { (errorValue) in
+            XCTAssertTrue(errorValue.isNull)
+            XCTAssertEqual(NSData(contentsOfFile: filePath), NSData(hexString: "01027fff"))
+            expectation.fulfill()
+        }
+        self.context.globalObject.setValue(unsafeBitCast(block, AnyObject.self), forProperty: "block")
+
+        self.context.evaluateScript("fs.writeFile('\(filePath)', dataBuffer, function(err) { block(err); });")
         self.waitForExpectationsWithTimeout(0.5, handler: nil)
     }
 
