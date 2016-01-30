@@ -25,7 +25,8 @@
 
 + (void)load {
     [TCJSModule registerGlobalModuleNamed:@"util" withBlock:^TCJSModule *(JSContext *context) {
-        TCJSModule *module = [[TCJSModule alloc] init];
+        NSString *jsImplPath = [[NSBundle bundleForClass:TCJSUtil.class] pathForResource:@"TCJSUtils" ofType:@"js"];
+        TCJSModule *module = [[TCJSModule alloc] initWithScriptContentsOfFile:jsImplPath];
         module.exports[@"toString"] = ^(JSValue *obj) {
             return [TCJSUtil toString:obj context:[JSContext currentContext]];
         };

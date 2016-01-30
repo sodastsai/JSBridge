@@ -96,5 +96,18 @@ class UtilsTests: JSBridgeTests {
             "~{\"line\":1,\"column\":30}=")
         XCTAssertEqual(self.context.evaluateScript("util.format('~%d=', new Date())").toString(), "~NaN=")
     }
+
+    func testInherits() {
+        self.context.evaluateScript("function A(name) { this.name = name; }")
+        self.context.evaluateScript("function B(name, gender) { this.gender = gender; A.call(this, name); }")
+        self.context.evaluateScript("util.inherits(B, A);")
+        self.context.evaluateScript("var b = new B('Peter', 'Male');")
+        self.context.evaluateScript("A.prototype.hi = function() { return 'Hi, ' + this.name; }")
+        XCTAssertEqual(self.context.evaluateScript("b.hi();").toString(), "Hi, Peter")
+        XCTAssertTrue(self.context.evaluateScript("b instanceof B").toBool())
+        XCTAssertTrue(self.context.evaluateScript("b instanceof A").toBool())
+        XCTAssertFalse(self.context.evaluateScript("b instanceof Array").toBool())
+        XCTAssertEqual(self.context.evaluateScript("b.constructor.super_;"), self.context.evaluateScript("A;"))
+    }
     
 }

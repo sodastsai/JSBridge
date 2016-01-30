@@ -56,6 +56,7 @@
 		FEB7EEC11C5B487100B0D44E /* TCJSDispatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSDispatch.h; sourceTree = "<group>"; };
 		FEB7EEC61C5B595400B0D44E /* TCJSDataBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSDataBuffer.h; sourceTree = "<group>"; };
 		FEB7EEC71C5B595400B0D44E /* TCJSDataBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSDataBuffer.m; sourceTree = "<group>"; };
+		FEB7EECD1C5C4D9800B0D44E /* TCJSUtils.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = TCJSUtils.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +101,7 @@
 				FEB7EEA51C59E7C600B0D44E /* TCJSTimer.m */,
 				FEB7EE871C59BE6B00B0D44E /* TCJSUtils.h */,
 				FEB7EE881C59BE6B00B0D44E /* TCJSUtils.m */,
+				FEB7EECD1C5C4D9800B0D44E /* TCJSUtils.js */,
 				FEB7EEB21C5A0EDF00B0D44E /* TCJSFileSystem.h */,
 				FEB7EEB31C5A0EDF00B0D44E /* TCJSFileSystem.m */,
 				FEB7EEC61C5B595400B0D44E /* TCJSDataBuffer.h */,

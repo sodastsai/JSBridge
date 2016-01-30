@@ -74,6 +74,8 @@ interface IUtil {  // This interface is used for the exports of `require('util')
 
     format(...formats: any[]): string;  // node's format function (`util.format`)
     inspect(obj: any): string;  // node's inspect function (`util.inspect`)
+
+    inherits(constructor: any, superConstructor: any);
 }
 
 
