@@ -46,3 +46,4 @@ fastlane/codesign
 # node.js
 node_modules
 ts-example.ts
+ts-example.js
