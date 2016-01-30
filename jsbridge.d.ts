@@ -23,6 +23,7 @@ declare const require: IRequireFunc;  // Import/Load other scripts in.
  * * `util`: see `Util`.
  * * `fs`: see `FS`.
  * * `dispatch`: see `Dispatch`.
+ * * `events`: see `EventEmitter`
  * * `underscore`: Check underscore.js 1.8.3 (External, from http://underscorejs.org)
  * * `q`: Check q.js 1.4.1 (External, from https://github.com/kriskowal/q)
  */
@@ -143,4 +144,23 @@ interface IDispatch {  // This interface is used for the exports of `require('di
     /* Note that the `queueName` argument should pass one of above queues */
     async(queueName: string, block: () => void, ...arguments: any[]);
     async(block: () => void, ...arguments: any[]);
+}
+
+
+// Events --------------------------------------------------------------------------------------------------------------
+declare namespace EventEmitter {
+    interface IEventEmitterListener {
+        (...args: any[]): void;
+    }
+    export class EventEmitter {  // This class is used as the exports of `require('fs');`
+        addEventListener(event: string, listener: IEventEmitterListener): EventEmitter;
+        on(event: string, listener: IEventEmitterListener): EventEmitter;
+        once(event: string, listener: IEventEmitterListener): EventEmitter;
+        removeEventListener(event: string, listener: IEventEmitterListener): EventEmitter;
+        removeAllListeners(event?: string): EventEmitter;
+        setMaxListeners(count: number): EventEmitter;
+        getMaxListeners(): number;
+        listenerCount(event: string): number;
+        emit(event: string, ...args: any[]): boolean;
+    }
 }

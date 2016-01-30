@@ -57,6 +57,7 @@
 		FEB7EEC61C5B595400B0D44E /* TCJSDataBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCJSDataBuffer.h; sourceTree = "<group>"; };
 		FEB7EEC71C5B595400B0D44E /* TCJSDataBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCJSDataBuffer.m; sourceTree = "<group>"; };
 		FEB7EECD1C5C4D9800B0D44E /* TCJSUtils.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = TCJSUtils.js; sourceTree = "<group>"; };
+		FEB7EECE1C5C5B0C00B0D44E /* TCJSEventEmitter.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = TCJSEventEmitter.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +112,7 @@
 				FEB7EEB91C5A1C8200B0D44E /* TCJSExtraModules.m */,
 				FEB7EEB71C5A1C6000B0D44E /* TCJS_underscore_1.8.3.js */,
 				FEB7EEBD1C5B091200B0D44E /* TCJS_q_1.4.1.js */,
+				FEB7EECE1C5C5B0C00B0D44E /* TCJSEventEmitter.js */,
 			);
 			path = JSBridge;
 			sourceTree = "<group>";

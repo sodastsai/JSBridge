@@ -1,0 +1,20 @@
+{
+  "name": "js-bridge",
+  "version": "0.0.1",
+  "description": "iOS JavaScriptCore Extension",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sodastsai/JSBridge.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/sodastsai/JSBridge/issues"
+  },
+  "homepage": "https://github.com/sodastsai/JSBridge#readme",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-typescript": "^2.10.0"
+  }
+}

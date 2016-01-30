@@ -4,5 +4,8 @@
         "module": "commonjs",
         "rootDir": ".",
         "sourceMap": true
-    }
+    },
+    "exclude": [
+        "node_modules"
+    ]
 }

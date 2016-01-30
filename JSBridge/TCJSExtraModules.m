@@ -37,6 +37,10 @@
         return [[TCJSModule alloc] initWithScriptContentsOfFile:[[NSBundle bundleForClass:TCJSExtraModules.class]
                                                                  pathForResource:@"TCJS_q_1.4.1" ofType:@"js"]];
     }];
+    [TCJSModule registerGlobalModuleNamed:@"events" withBlock:^TCJSModule *(JSContext *context) {
+        return [[TCJSModule alloc] initWithScriptContentsOfFile:[[NSBundle bundleForClass:TCJSExtraModules.class]
+                                                                 pathForResource:@"TCJSEventEmitter" ofType:@"js"]];
+    }];
 }
 
 @end
