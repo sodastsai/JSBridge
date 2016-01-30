@@ -45,6 +45,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable instancetype)mainModule;
 
++ (instancetype)moduleWithExports:(JSValue *)exports;
+
 - (nullable instancetype)initWithScriptContentsOfFile:(nullable NSString *)path;
 - (nullable instancetype)initWithScriptContentsOfFile:(nullable NSString *)path
                                             loadPaths:(nullable NSArray<NSString *> *)loadPaths;

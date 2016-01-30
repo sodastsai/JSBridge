@@ -52,10 +52,8 @@ JSExportAs(isDirectory, - (void)isDirectory:(NSString *)path callback:(JSValue *
 
 + (void)load {
     [TCJSModule registerGlobalModuleNamed:@"fs" withBlock:^TCJSModule *(JSContext *context) {
-        TCJSModule *module = [[TCJSModule alloc] init];
-        module.exports = [JSValue valueWithObject:[TCJSFileSystem defaultFileSystem]
-                                        inContext:[JSContext currentContext]];
-        return module;
+        return [TCJSModule moduleWithExports:[JSValue valueWithObject:[TCJSFileSystem defaultFileSystem]
+                                                            inContext:context]];
     }];
 }
 

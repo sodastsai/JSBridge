@@ -81,6 +81,12 @@
                                                object:[UIApplication sharedApplication]];
 }
 
++ (instancetype)moduleWithExports:(JSValue *)exports {
+    TCJSModule *module = [[TCJSModule alloc] init];
+    module.exports = exports;
+    return module;
+}
+
 - (instancetype)initWithScriptContentsOfFile:(NSString *)path {
     return self = [self initWithScriptContentsOfFile:path loadPaths:nil];
 }
