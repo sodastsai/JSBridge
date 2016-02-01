@@ -81,5 +81,20 @@ class EventEmitterTests: JSBridgeTests {
         self.context.evaluateScript("emitter.emit('go', 42);")
         XCTAssertEqual(callCount, 1)
     }
-    
+
+    func testInheritence() {
+        self.context.evaluateScript("var util = require('util');")
+        self.context.evaluateScript("function MyEventEmitter() { events.EventEmitter.apply(this, arguments); }")
+        self.context.evaluateScript("util.inherits(MyEventEmitter, events.EventEmitter);")
+        self.context.evaluateScript("var emitter = new MyEventEmitter();")
+
+        XCTAssertTrue(self.context.evaluateScript("emitter instanceof events.EventEmitter;").toBool())
+        let block: @convention(block) (Int) -> Void = { (answer: Int) in
+            XCTAssertEqual(answer, 42)
+        }
+        self.context.globalObject.setValue(unsafeBitCast(block, AnyObject.self), forProperty: "block")
+        self.context.evaluateScript("emitter.on('go', block);")
+        self.context.evaluateScript("emitter.emit('go', 42);")
+    }
+
 }
