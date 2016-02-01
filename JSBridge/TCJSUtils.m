@@ -81,6 +81,17 @@
         module.exports[@"enumerate"] = ^NSArray<NSString *> *(JSValue *jsValue) {
             return [TCJSUtil arrayWithPropertiesOfValue:jsValue context:[JSContext currentContext]];
         };
+        module.exports[@"extend"] = ^JSValue *_Nullable() {
+            NSArray<JSValue *> *arguments = [JSContext currentArguments];
+            if (arguments.count <= 1) {
+                return arguments.firstObject;
+            } else {
+                return [TCJSUtil extends:arguments.firstObject
+                             withObjects:[arguments subarrayFromIndex:1]
+                                 context:[JSContext currentContext]];
+            }
+        };
+
         return module;
     }];
 }
@@ -235,6 +246,13 @@
     }
 
     return [NSArray arrayWithArray:result];
+}
+
++ (JSValue *)extends:(JSValue *)object withObjects:(NSArray<JSValue *> *)objects context:(JSContext *)context {
+    NSMutableArray *arguments = [[NSMutableArray alloc] initWithCapacity:objects.count+1];
+    [arguments addObject:object];
+    [arguments addObjectsFromArray:objects];
+    return [context[@"Object"] invokeMethod:@"assign" withArguments:arguments];
 }
 
 @end

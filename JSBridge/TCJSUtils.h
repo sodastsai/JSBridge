@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSArray<NSString *> *)arrayWithPropertiesOfValue:(JSValue *)value context:(JSContext *)context;
 
++ (JSValue *)extends:(JSValue *)object withObjects:(NSArray<JSValue *> *)objects context:(JSContext *)context;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -19,6 +19,7 @@
 
 import XCTest
 import JavaScriptCore
+import TCJSBridge
 
 class UtilsTests: JSBridgeTests {
     
@@ -108,6 +109,25 @@ class UtilsTests: JSBridgeTests {
         XCTAssertTrue(self.context.evaluateScript("b instanceof A").toBool())
         XCTAssertFalse(self.context.evaluateScript("b instanceof Array").toBool())
         XCTAssertEqual(self.context.evaluateScript("b.constructor.super_;"), self.context.evaluateScript("A;"))
+    }
+
+    func testExtends1() {
+        let obj1 = self.context.evaluateScript("(function() { return {answer: 41, name: 'Peter'}; })();")
+        let obj2 = self.context.evaluateScript("(function() { return {answer: 42, gender: 'Male'}; })();")
+        let obj3 = TCJSUtil.extends(obj1, withObjects: [obj2], context: self.context)
+
+        XCTAssertEqual(obj3.toObject() as! [String: NSObject], ["answer": 42, "gender": "Male", "name": "Peter"])
+        XCTAssertTrue(obj1.isEqualToObject(obj3))
+    }
+
+    func testExtends2() {
+        let obj1 = ["answer": 41, "name": "Peter"]
+        let obj2 = ["answer": 42, "gender": "Male"]
+        self.context.globalObject.setValue(obj1, forProperty: "obj1")
+        self.context.globalObject.setValue(obj2, forProperty: "obj2")
+        let obj3 = self.context.evaluateScript("util.extend(obj1, obj2);").toObject() as! [String: NSObject]
+
+        XCTAssertEqual(obj3, ["answer": 42, "gender": "Male", "name": "Peter"])
     }
     
 }
