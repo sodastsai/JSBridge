@@ -21,15 +21,14 @@
 #import <TCJSBridge/TCJSJavaScriptContext.h>
 #import <BenzeneFoundation/BenzeneFoundation.h>
 
-@protocol TCJSTimer <JSExport>
+@interface TCJSTimer : NSObject <TCJSJavaScriptContextExtension>
 
-@end
-
-@interface TCJSTimer : NSObject <TCJSTimer, TCJSJavaScriptContextExtension>
+@property (nonatomic, strong, readonly) NSString *timerId;
 
 @property (nonatomic, strong, readonly) JSValue *callback;
 @property (nonatomic, strong, readonly) NSArray *arguments;
 @property (nonatomic, strong) NSTimer *timer;
+@property (nonatomic, assign) BOOL repeat;
 
 - (instancetype)initWithCallback:(JSValue *)callback
                        arguments:(NSArray *)arguments
@@ -51,28 +50,36 @@
 + (void)loadExtensionForJSContext:(JSContext *)context {
     JSValue *globalObject = context.globalObject;
 
-    globalObject[@"setTimeout"] = ^TCJSTimer *(JSValue *callback, long timeout) {
+    globalObject[@"setTimeout"] = ^NSString *(JSValue *callback, long timeout) {
         NSArray *arguments = [[JSContext currentArguments] subarrayFromIndex:2];
         TCJSTimer *timer = [[TCJSTimer alloc] initWithCallback:callback
                                                      arguments:arguments
                                                        timeout:timeout/1000.
                                                         repeat:NO];
         [timer start];
-        return timer;
+        return timer.timerId;
     };
-    globalObject[@"setInterval"] = ^TCJSTimer *(JSValue *callback, long timeout) {
+    globalObject[@"setInterval"] = ^NSString *(JSValue *callback, long timeout) {
         NSArray *arguments = [[JSContext currentArguments] subarrayFromIndex:2];
         TCJSTimer *timer = [[TCJSTimer alloc] initWithCallback:callback
                                                      arguments:arguments
                                                        timeout:timeout/1000.
                                                         repeat:YES];
         [timer start];
-        return timer;
+        return timer.timerId;
     };
-    globalObject[@"clearInterval"] = globalObject[@"clearTimeout"] = ^(TCJSTimer *timer) {
-        [timer stop];
+    globalObject[@"clearInterval"] = globalObject[@"clearTimeout"] = ^(NSString *timerId) {
+        [[TCJSTimer timersPool][timerId] stop];
     };
+}
 
++ (NSMutableDictionary<NSString *, TCJSTimer *> *)timersPool {
+    static NSMutableDictionary *dict;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        dict = [NSMutableDictionary dictionary];
+    });
+    return dict;
 }
 
 - (instancetype)initWithCallback:(JSValue *)callback
@@ -87,12 +94,18 @@
                                        selector:@selector(timerTriggered:)
                                        userInfo:nil
                                         repeats:repeat];
+        _repeat = repeat;
+        _timerId = [NSString randomStringByLength:32];
+        [TCJSTimer timersPool][_timerId] = self;
     }
     return self;
 }
 
 - (void)timerTriggered:(NSTimer *)timer {
     [self.callback callWithArguments:self.arguments];
+    if (!self.repeat) {
+        [[TCJSTimer timersPool] removeObjectForKey:self.timerId];
+    }
 }
 
 - (void)start {
@@ -101,6 +114,7 @@
 
 - (void)stop {
     [self.timer invalidate];
+    [[TCJSTimer timersPool] removeObjectForKey:self.timerId];
 }
 
 @end

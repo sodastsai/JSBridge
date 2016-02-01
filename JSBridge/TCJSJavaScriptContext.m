@@ -20,6 +20,29 @@
 #import "TCJSJavaScriptContext.h"
 #import <objc/runtime.h>
 
+TCJS_EXTERN NSMutableSet<Class> *TCJSJavaScriptContextRegisteredExtensions();
+
+#pragma mark - Main
+
+TCJS_EXTERN void TCJSJavaScriptContextSetupContext(JSContext *context) {
+    context[@"global"] = context[@"root"] = context.globalObject;
+    for (Class ExtClass in TCJSJavaScriptContextRegisteredExtensions()) {
+        [ExtClass loadExtensionForJSContext:context];
+    }
+}
+
+TCJS_EXTERN void TCJSJavaScriptContextDeactivateContext(JSContext *context) {
+    context[@"global"] = context[@"root"] = [JSValue valueWithUndefinedInContext:context];
+    for (Class ExtClass in TCJSJavaScriptContextRegisteredExtensions()) {
+        if ([ExtClass respondsToSelector:@selector(deactivateExtensionForJSContext:)]) {
+            [ExtClass deactivateExtensionForJSContext:context];
+        }
+    }
+    context.exception = nil;
+}
+
+#pragma mark - Extension
+
 TCJS_EXTERN NSMutableSet<Class> *TCJSJavaScriptContextRegisteredExtensions() {
     static NSMutableSet *extensions;
     static dispatch_once_t onceToken;
@@ -39,12 +62,7 @@ TCJS_EXTERN void TCJSJavaScriptContextRegisterExtension(Class extension) {
     [TCJSJavaScriptContextRegisteredExtensions() addObject:extension];
 }
 
-TCJS_EXTERN void TCJSJavaScriptContextSetupContext(JSContext *context) {
-    context[@"global"] = context[@"root"] = context.globalObject;
-    for (Class ExtClass in TCJSJavaScriptContextRegisteredExtensions()) {
-        [ExtClass loadExtensionForJSContext:context];
-    }
-}
+#pragma mark - Dispatch Queue
 
 static char TCJSJavaScriptContextMainDispatchQueueAssociationKey;
 static char TCJSJavaScriptContextBackgroundDispatchQueueAssociationKey;

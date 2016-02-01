@@ -36,7 +36,7 @@ JSExportAs(subDataBuffer, - (nullable instancetype)subDataBufferFromIndex:(NSUIn
 
 // Content
 @property (nonatomic, readonly) NSString *hexString;
-- (JSValue *)byte;
+- (id)byte;
 - (BOOL)equal:(TCJSDataBuffer *)dataBuffer;
 
 - (void)append:(TCJSDataBuffer *)dataBuffer;
@@ -141,7 +141,7 @@ TCJS_STATIC_INLINE JSValue *TCJSDataBufferOutOfBoundError(NSUInteger lBound, NSU
     }
 }
 
-- (JSValue *)byte {
+- (id)byte {
     JSContext *context = [JSContext currentContext];
     NSArray<JSValue *> *arguments = [JSContext currentArguments];
 
@@ -151,7 +151,7 @@ TCJS_STATIC_INLINE JSValue *TCJSDataBufferOutOfBoundError(NSUInteger lBound, NSU
         for (NSUInteger i=0; i<self.data.length; ++i) {
             buffer[i] = @(((uint8_t *)self.data.bytes)[i]);
         }
-        return [JSValue valueWithObject:[NSArray arrayWithArray:buffer] inContext:context];
+        return [NSArray arrayWithArray:buffer];
     }
 
     // Indexed operation ...
@@ -170,7 +170,7 @@ TCJS_STATIC_INLINE JSValue *TCJSDataBufferOutOfBoundError(NSUInteger lBound, NSU
 
     if (arguments.count == 1) {
         // Get
-        return [JSValue valueWithUInt32:((uint8_t *)self.data.bytes)[idx] inContext:context];
+        return @(((uint8_t *)self.data.bytes)[idx]);
     } else {
         // Set
         BOOL validValue = NO;

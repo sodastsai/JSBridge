@@ -29,14 +29,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readonly) NSString *filename;
 @property (nonatomic, assign, readonly, getter=isLoaded) BOOL loaded;
-@property (nonatomic, strong, readwrite) JSValue *exports;
-
+@property (nonatomic, nullable, readwrite) JSValue *exports;
 @property (nonatomic, strong, readonly) NSMutableArray<NSString *> *paths;
-@property (nonatomic, strong, readonly) JSValue *require;
-
 @property (nonatomic, strong, readonly) NSMutableDictionary *pool;
 
 - (void)clearRequireCache;
+
+- (nullable NSString *)resolve:(NSString *)jsPath;
+- (nullable id)require:(NSString *)jsPath;
 
 @end
 
@@ -45,9 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)registerGlobalModuleNamed:(NSString *)globalModuleName
                         withBlock:(TCJSModule *_Nullable (^)(JSContext *context))block;
 
-+ (nullable instancetype)mainModule;
++ (nullable instancetype)mainModuleOfContext:(JSContext *)context;
 
-+ (instancetype)moduleWithExports:(JSValue *)exports;
++ (instancetype)moduleWithExports:(id)exports;
 
 - (nullable instancetype)initWithScriptContentsOfFile:(nullable NSString *)path;
 - (nullable instancetype)initWithScriptContentsOfFile:(nullable NSString *)path
@@ -58,8 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
                        context:(nullable JSContext *)context
                           pool:(nullable NSMutableDictionary *)pool NS_DESIGNATED_INITIALIZER;
 
-- (nullable NSString *)resolve:(NSString *)jsPath;
-- (nullable JSValue *)require:(NSString *)jsPath;
+@property (nonatomic, strong, readonly) NSMutableDictionary *pool;
 
 - (JSValue *)evaluateScript:(NSString *)script sourceURL:(nullable NSURL *)sourceURL context:(JSContext *)context;
 

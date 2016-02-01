@@ -27,11 +27,12 @@
 @property (nonatomic, assign, readwrite, getter=isLoaded) BOOL loaded;
 @property (nonatomic, strong, readwrite) NSMutableArray<NSString *> *paths;
 
+@property (nonatomic, strong) JSManagedValue *managedExports;
+@property (nonatomic, strong) JSValue *exports1;
+
 @end
 
 @implementation TCJSModule
-
-@synthesize exports = _exports, require = _require, pool = _pool;
 
 + (void)loadExtensionForJSContext:(JSContext *)context {
     TCJSModule *module = [[TCJSModule alloc]
@@ -44,7 +45,7 @@
     module.filename = @".";
     module.loaded = YES;
     context[@"module"] = module;
-    context[@"require"] = module.require;
+    context[@"require"] = ^(NSString *path){ return [module require:path]; };
 }
 
 + (NSMutableDictionary<NSString *, TCJSModule *(^)(JSContext *)> *)registeredGlobalModules {
@@ -60,8 +61,8 @@
     self.registeredGlobalModules[globalModuleName] = block;
 }
 
-+ (instancetype)mainModule {
-    id module = [JSContext currentContext][@"module"];
++ (instancetype)mainModuleOfContext:(JSContext *)context {
+    id module = context[@"module"];
     if ([module isKindOfClass:JSValue.class]) {
         return [module toObjectOfClass:TCJSModule.class];
     } else if ([module isKindOfClass:TCJSModule.class]) {
@@ -117,34 +118,24 @@
                           pool:(nullable NSMutableDictionary *)pool {
     if (self = [super init]) {
         // Set load paths if necessary
+        context = context ?: [JSContext currentContext];
         if (!loadPaths) {
-            TCJSModule *mainModule = [TCJSModule mainModule];
+            TCJSModule *mainModule = [TCJSModule mainModuleOfContext:context];
             if (mainModule) {
                 loadPaths = mainModule.paths;
             }
         }
-        context = context ?: [JSContext currentContext];
         NSAssert(loadPaths, @"There's no global module ... loadPaths must be set");
         NSAssert(context, @"Cann't find a JSContext");
 
         // Initialize
         _paths = [loadPaths mutableCopy];
-        _exports = [JSValue valueWithNewObjectInContext:[JSContext currentContext]];
         _loaded = NO;
         _filename = path;
         _moduleID = [NSString randomStringByLength:32];
-        _pool = pool;
+        _pool = pool ?: [@{} mutableCopy];
 
-        // Require Function
-        @weakify(self);
-        _require = [JSValue valueWithObject:^JSValue *_Nullable(NSString *path) {
-            @strongify(self);
-            return [self require:path];
-        } inContext:context];
-        _require[@"resolve"] = [JSValue valueWithObject:^NSString *_Nullable(NSString *path) {
-            @strongify(self);
-            return [self resolve:path];
-        } inContext:context];
+        self.exports = [JSValue valueWithNewObjectInContext:context];
 
         // Load script
         if (path) {
@@ -161,6 +152,7 @@
 }
 
 - (void)dealloc {
+    self.exports = nil;
     [self.class.sharedRequireCache removeObjectForKey:self.moduleID];
 }
 
@@ -168,6 +160,30 @@
 
 + (void)applicationDidReceiveMemoryWarning:(NSNotification *)notification {
     [self.sharedRequireCache removeAllObjects];
+}
+
+#pragma mark - Property
+
+- (JSValue *)exports {
+    return self.managedExports.value ?: [JSValue valueWithUndefinedInContext:[JSContext currentContext]];
+}
+
+- (void)setExports:(JSValue *)exports {
+    @synchronized(self) {
+        if (self.managedExports && self.managedExports.value) {
+            JSContext *context = self.managedExports.value.context ?: [JSContext currentContext];
+            NSAssert(context, @"Can't get a JSContext");
+            [context.virtualMachine removeManagedReference:self.managedExports withOwner:self];
+            self.managedExports = nil;
+        }
+
+        if (exports) {
+            JSContext *context = exports.context ?: [JSContext currentContext];
+            NSAssert(context, @"Can't get a JSContext");
+            self.managedExports = [JSManagedValue managedValueWithValue:exports];
+            [context.virtualMachine addManagedReference:self.managedExports withOwner:self];
+        }
+    }
 }
 
 #pragma mark - Require Method
@@ -239,24 +255,23 @@
     @autoreleasepool {
         NSString *paddedScript = [NSString stringWithFormat:
                                   @"(function() {\n"
-                                  @"    function _scriptLoader(module, exports, require) {\n"
-                                  @"        function _scriptBody() {\n"
-                                  @"            /* --- Start of Script Body --- */\n"
+                                  @"    return function(module) {\n"
+                                  @"        return (function _moduleContext() {  // `this` is `module`\n"
+                                  @"            function _require(path) {\n"
+                                  @"                return module.require(path);"
+                                  @"            }\n"
+                                  @"            return (function _body(module, exports, require) {\n"
+                                  @"                /* --- Start of Script Body --- */\n"
                                   @"%@\n"
-                                  @"            /* --- End of Script Body --- */\n"
-                                  @"        }\n"
-                                  @"        return _scriptBody.apply(exports);\n"
+                                  @"                /* --- End of Script Body --- */\n"
+                                  @"            }).call(this.exports, this, this.exports, _require);\n"
+                                  @"        }).call(module);\n"
                                   @"    }\n"
-                                  @"    return _scriptLoader;\n"
                                   @"})();\n", script];
         JSValue *scriptLoader = (sourceURL ?
                                  [context evaluateScript:paddedScript withSourceURL:sourceURL] :
                                  [context evaluateScript:paddedScript]);
-        return [scriptLoader callWithArguments:@[
-            self,
-            self.exports,
-            ^JSValue *(NSString *path){ return [self require:path]; },
-        ]];
+        return [scriptLoader callWithArguments:@[self]];
     }
 }
 

@@ -28,8 +28,21 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.context = JSContext()
-        TCJSJavaScriptContextSetupContext(self.context)
+        self.loadContext()
+    }
+
+    @IBAction func reset(sender: UIButton) {
+        TCJSJavaScriptContextDeactivateContext(self.context)
+        self.context = nil
+
+        self.loadContext()
+    }
+
+    func loadContext () {
+        if self.context == nil {
+            self.context = JSContext()
+            TCJSJavaScriptContextSetupContext(self.context)
+        }
     }
 
 }

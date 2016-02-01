@@ -57,9 +57,9 @@ class RequireTests: JSBridgeTests {
     }
 
     func testResolve() {
-        XCTAssertEqual(self.context.evaluateScript("require.resolve('RequireTests.js');").toString(),
+        XCTAssertEqual(self.context.evaluateScript("module.resolve('RequireTests.js');").toString(),
             self.bundle.pathForResource("RequireTests", ofType: "js"))
-        XCTAssertTrue(self.context.evaluateScript("require.resolve('11RequireTests.js');").isUndefined)
+        XCTAssertTrue(self.context.evaluateScript("module.resolve('11RequireTests.js');").isUndefined)
     }
 
     func testClearRequireCache() {

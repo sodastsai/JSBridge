@@ -34,15 +34,21 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+TCJS_EXTERN void TCJSJavaScriptContextSetupContext(JSContext *context);
+TCJS_EXTERN void TCJSJavaScriptContextDeactivateContext(JSContext *context);
+
+#pragma mark - Extension
+
 @protocol TCJSJavaScriptContextExtension <NSObject>
 
-+ (void)loadExtensionForJSContext:(JSContext *)context;
+@required + (void)loadExtensionForJSContext:(JSContext *)context;
+@optional + (void)deactivateExtensionForJSContext:(JSContext *)context;
 
 @end
 
 TCJS_EXTERN void TCJSJavaScriptContextRegisterExtension(Class extension);
 
-TCJS_EXTERN void TCJSJavaScriptContextSetupContext(JSContext *context);
+#pragma mark - Dispatch Queue
 
 TCJS_EXTERN void TCJSJavaScriptContextSetMainDispatchQueue(JSContext *context,
                                                            dispatch_queue_t _Nullable dispatchQueue);
