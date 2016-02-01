@@ -87,10 +87,11 @@ declare namespace DataBuffer {
     function fromByteArray(byteArray: number[]): IDataBuffer;
 
     interface IDataBuffer {
-        // By changing this field, the content of this data buffer would be also modified.
+        length(): number;
+        // By calling this field, the content of this data buffer would be also modified.
         // So if you want extend this buffer, just increase the number. (new bytes are filled by 0.)
         // And if you want to reduce the size, just decrease the number. (existed bytes are dropped.)
-        length: number;
+        length(length: number);
 
         byte(): number[];  // Get a number array which represents this buffer
         byte(index: number): number;  // Get a byte at index

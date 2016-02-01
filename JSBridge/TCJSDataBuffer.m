@@ -31,7 +31,7 @@
 JSExportAs(subDataBuffer, - (nullable instancetype)subDataBufferFromIndex:(NSUInteger)start length:(NSUInteger)length);
 - (instancetype)copyAsNewDataBuffer;
 
-@property (nonatomic, readwrite) NSUInteger length;
+- (id)length;
 
 // Content
 @property (nonatomic, readonly) NSString *hexString;
@@ -107,17 +107,23 @@ TCJS_STATIC_INLINE JSValue *TCJSDataBufferOutOfBoundError(NSUInteger lBound, NSU
     return self.data.hash;
 }
 
-#pragma mark - Properties
-
-- (NSUInteger)length {
-    return self.data.length;
-}
-
-- (void)setLength:(NSUInteger)length {
-    self.data.length = length;
-}
-
 #pragma mark - Methods
+
+- (id)length {
+    JSContext *context = [JSContext currentContext];
+    NSArray<JSValue *> *arguments = [JSContext currentArguments];
+    if (arguments.count == 0) {
+        return @(self.data.length);
+    } else {
+        if (!arguments[0].isNumber) {
+            context.exception = [JSValue valueWithNewErrorFromMessage:@"length argument should be a number."
+                                                            inContext:context];
+        } else {
+            self.data.length = arguments[0].toNumber.unsignedIntegerValue;
+        }
+        return nil;
+    }
+}
 
 - (JSValue *)byte {
     JSContext *context = [JSContext currentContext];
@@ -125,8 +131,8 @@ TCJS_STATIC_INLINE JSValue *TCJSDataBufferOutOfBoundError(NSUInteger lBound, NSU
 
     if (arguments.count == 0) {
         // Return bytes array
-        NSMutableArray<NSNumber *> *buffer = [NSMutableArray arrayWithCapacity:self.length];
-        for (NSUInteger i=0; i<self.length; ++i) {
+        NSMutableArray<NSNumber *> *buffer = [NSMutableArray arrayWithCapacity:self.data.length];
+        for (NSUInteger i=0; i<self.data.length; ++i) {
             buffer[i] = @(((uint8_t *)self.data.bytes)[i]);
         }
         return [JSValue valueWithObject:[NSArray arrayWithArray:buffer] inContext:context];

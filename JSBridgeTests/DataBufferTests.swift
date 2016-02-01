@@ -77,7 +77,10 @@ class DataBufferTests: JSBridgeTests {
     func testLength() {
         let dataBuffer = TCJSDataBuffer(data: NSMutableData(bytes: [0x01, 0x02] as [UInt8], length: 2))
         self.context.globalObject.setValue(dataBuffer, forProperty: "dataBuffer")
-        XCTAssertEqual(self.context.evaluateScript("dataBuffer.length;").toNumber(), 2)
+        XCTAssertEqual(self.context.evaluateScript("dataBuffer.length();").toNumber(), 2)
+
+        self.context.evaluateScript("dataBuffer.length(20);")
+        XCTAssertEqual(self.context.evaluateScript("dataBuffer.length();").toNumber(), 20)
     }
 
     func testHexString() {
