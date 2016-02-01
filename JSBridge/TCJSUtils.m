@@ -70,6 +70,7 @@
                     value.isDate :
                     [TCJSUtil isDate:value context:[JSContext currentContext]]);
         };
+
         module.exports[@"format"] = ^NSString *() {
             return [TCJSUtil format];
         };
@@ -77,6 +78,9 @@
             return [TCJSUtil inspect:jsValue];
         };
 
+        module.exports[@"enumerate"] = ^NSArray<NSString *> *(JSValue *jsValue) {
+            return [TCJSUtil arrayWithPropertiesOfValue:jsValue context:[JSContext currentContext]];
+        };
         return module;
     }];
 }
@@ -218,6 +222,19 @@
         result = jsValue.toString;
     }
     return [result stringByReplacingCharactersFromSet:[NSCharacterSet newlineCharacterSet] withString:@""];
+}
+
++ (NSArray<NSString *> *)arrayWithPropertiesOfValue:(JSValue *)jsValue context:(JSContext *)context {
+    NSMutableArray *result = [[NSMutableArray alloc] init];
+
+    id value = jsValue.toObject;
+    if ([value conformsToProtocol:@protocol(JSExport)] && [value conformsToProtocol:@protocol(TCJSUtilEnumerate)]) {
+        return [[value class] enumerableJSProperties];
+    } else {
+        return [context[@"Object"] invokeMethod:@"keys" withArguments:@[jsValue]].toArray;
+    }
+
+    return [NSArray arrayWithArray:result];
 }
 
 @end

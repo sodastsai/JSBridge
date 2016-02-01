@@ -21,6 +21,7 @@
 #import "TCJSUtils.h"
 #import "TCJSJavaScriptContext.h"
 #import <BenzeneFoundation/BenzeneFoundation.h>
+#import <libextobjc/extobjc.h>
 
 @protocol TCJSDataBuffer <JSExport>
 
@@ -46,7 +47,7 @@ JSExportAs(replace,
 
 @end
 
-@interface TCJSDataBuffer () <TCJSDataBuffer, TCJSJavaScriptContextExtension>
+@interface TCJSDataBuffer () <TCJSDataBuffer, TCJSJavaScriptContextExtension, TCJSUtilEnumerate>
 
 @end
 
@@ -63,6 +64,21 @@ TCJS_STATIC_INLINE JSValue *TCJSDataBufferOutOfBoundError(NSUInteger lBound, NSU
 
 + (void)loadExtensionForJSContext:(JSContext *)context {
     context[@"DataBuffer"] = self;
+}
+
++ (NSArray<NSString *> *)enumerableJSProperties {
+    return @[
+        @"length",
+        @"hexString",
+        @"byte",
+        @"equal",
+        @"append",
+        @"delete",
+        @"insert",
+        @"replace",
+        @"subDataBuffer",
+        @"copyAsNewDataBuffer",
+    ];
 }
 
 + (instancetype)create {

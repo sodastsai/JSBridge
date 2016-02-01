@@ -22,6 +22,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol TCJSUtilEnumerate <NSObject>
+
++ (NSArray<NSString *> *)enumerableJSProperties;
+
+@end
+
 @interface TCJSUtil : NSObject
 
 + (NSString *)format;
@@ -33,6 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isDate:(JSValue *)obj context:(JSContext *)context;
 + (BOOL)isError:(JSValue *)obj context:(JSContext *)context;
 + (BOOL)isRegExp:(JSValue *)obj context:(JSContext *)context;
+
++ (NSArray<NSString *> *)arrayWithPropertiesOfValue:(JSValue *)value context:(JSContext *)context;
 
 @end
 
