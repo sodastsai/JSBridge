@@ -31,7 +31,7 @@
 
 @implementation TCJSModule
 
-@synthesize exports = _exports, require = _require;
+@synthesize exports = _exports, require = _require, pool = _pool;
 
 + (void)loadExtensionForJSContext:(JSContext *)context {
     TCJSModule *module = [[TCJSModule alloc]
@@ -39,7 +39,8 @@
                           sourceFile:nil
                           loadPaths:@[[NSBundle mainBundle].bundlePath,
                                       [NSBundle bundleForClass:TCJSModule.class].bundlePath]
-                          context:context];
+                          context:context
+                          pool:nil];
     module.filename = @".";
     module.loaded = YES;
     context[@"module"] = module;
@@ -95,20 +96,25 @@
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
         NSString *scriptContent = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
         if (scriptContent) {
-            return self = [self initWithScript:scriptContent sourceFile:path loadPaths:loadPaths context:nil];
+            return self = [self initWithScript:scriptContent
+                                    sourceFile:path
+                                     loadPaths:loadPaths
+                                       context:nil
+                                          pool:nil];
         }
     }
     return self = nil;
 }
 
 - (instancetype)init {
-    return self = [self initWithScript:nil sourceFile:nil loadPaths:nil context:nil];
+    return self = [self initWithScript:nil sourceFile:nil loadPaths:nil context:nil pool:nil];
 }
 
 - (instancetype)initWithScript:(NSString *)script
                     sourceFile:(NSString *)path
                      loadPaths:(nullable NSArray<NSString *> *)loadPaths
-                       context:(nullable JSContext *)context {
+                       context:(nullable JSContext *)context
+                          pool:(nullable NSMutableDictionary *)pool {
     if (self = [super init]) {
         // Set load paths if necessary
         if (!loadPaths) {
@@ -127,6 +133,7 @@
         _loaded = NO;
         _filename = path;
         _moduleID = [NSString randomStringByLength:32];
+        _pool = pool;
 
         // Require Function
         @weakify(self);
@@ -163,6 +170,7 @@
                 } else {
                     scriptLoader = [context evaluateScript:paddedScript];
                 }
+
                 @weakify(self);
                 [scriptLoader callWithArguments:@[
                     self,

@@ -13,6 +13,7 @@ interface IModule { // Current module object
     exports: any;  // Exports symbols
     paths: [string];  // Readonly, search paths. The `require` function would find scripts under these paths
     require: IRequireFunc;  // Import/Load other scripts in.
+    poo: any;
     clearRequireCache();
 }
 declare const module: IModule;
