@@ -19,6 +19,7 @@ Pod::Spec.new do |s|
   s.public_header_files  = 'JSBridge/**/*.h'
   s.private_header_files = 'JSBridge/**/*_Internal.h'
   s.resources            = 'JSBridge/**/*.{js}'
+  s.preserve_paths       = 'jsbridge.d.ts'
 
   s.dependency 'BenzeneFoundation/UIKit', '~> 0.5.41'
   s.dependency 'libextobjc'
