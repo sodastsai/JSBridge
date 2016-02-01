@@ -151,35 +151,9 @@
             [_paths insertObject:path.stringByDeletingLastPathComponent atIndex:0];
         }
         if (script) {
-            @autoreleasepool {
-                NSString *paddedScript = [NSString stringWithFormat:
-                                          @"(function() {\n"
-                                          @"    function _scriptLoader(module, exports, require) {\n"
-                                          @"        function _scriptBody() {\n"
-                                          @"            /* --- Start of Script Body --- */\n"
-                                          @"%@\n"
-                                          @"            /* --- End of Script Body --- */\n"
-                                          @"        }\n"
-                                          @"        _scriptBody.apply(exports);\n"
-                                          @"    }\n"
-                                          @"    return _scriptLoader;\n"
-                                          @"})();\n", script];
-                JSValue *scriptLoader;
-                if (path) {
-                    scriptLoader = [context evaluateScript:paddedScript withSourceURL:[NSURL fileURLWithPath:path]];
-                } else {
-                    scriptLoader = [context evaluateScript:paddedScript];
-                }
-
-                @weakify(self);
-                [scriptLoader callWithArguments:@[
-                    self,
-                    self.exports,
-                    ^JSValue *(NSString *path){ @strongify(self); return [self require:path]; },
-                ]];
-                if (!(_loaded = context.exception == nil)) {
-                    return self = nil;
-                }
+            [self evaluateScript:script sourceURL:path?[NSURL fileURLWithPath:path] : nil context:context];
+            if (!(_loaded = context.exception == nil)) {
+                return self = nil;
             }
         }
     }
@@ -259,6 +233,31 @@
         }
     }
     return module.exports ?: [JSValue valueWithUndefinedInContext:currentContext];
+}
+
+- (JSValue *)evaluateScript:(NSString *)script sourceURL:(nullable NSURL *)sourceURL context:(JSContext *)context {
+    @autoreleasepool {
+        NSString *paddedScript = [NSString stringWithFormat:
+                                  @"(function() {\n"
+                                  @"    function _scriptLoader(module, exports, require) {\n"
+                                  @"        function _scriptBody() {\n"
+                                  @"            /* --- Start of Script Body --- */\n"
+                                  @"%@\n"
+                                  @"            /* --- End of Script Body --- */\n"
+                                  @"        }\n"
+                                  @"        return _scriptBody.apply(exports);\n"
+                                  @"    }\n"
+                                  @"    return _scriptLoader;\n"
+                                  @"})();\n", script];
+        JSValue *scriptLoader = (sourceURL ?
+                                 [context evaluateScript:paddedScript withSourceURL:sourceURL] :
+                                 [context evaluateScript:paddedScript]);
+        return [scriptLoader callWithArguments:@[
+            self,
+            self.exports,
+            ^JSValue *(NSString *path){ return [self require:path]; },
+        ]];
+    }
 }
 
 @end

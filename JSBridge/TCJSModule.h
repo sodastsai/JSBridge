@@ -61,6 +61,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSString *)resolve:(NSString *)jsPath;
 - (nullable JSValue *)require:(NSString *)jsPath;
 
+- (JSValue *)evaluateScript:(NSString *)script sourceURL:(nullable NSURL *)sourceURL context:(JSContext *)context;
+
 @end
 
 NS_ASSUME_NONNULL_END
