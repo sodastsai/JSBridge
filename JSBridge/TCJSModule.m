@@ -32,6 +32,11 @@
 
 @end
 
+TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSString *modulePath) {
+    NSString *message = BFFormatString(@"Cannot find module '%@'", modulePath);
+    return [JSValue valueWithNewErrorFromMessage:message inContext:context];
+}
+
 @implementation TCJSModule
 
 + (void)loadExtensionForJSContext:(JSContext *)context {
@@ -243,38 +248,46 @@
         if ([fullJSPath isSubpathOfPath:path] &&
             [[NSFileManager defaultManager] fileExistsAtPath:fullJSPath]) {
             return fullJSPath;
+        } else {
+            fullJSPath = nil;
         }
     }
+
+    JSContext *context = [JSContext currentContext];
+    if (!fullJSPath && context) {
+        context.exception = TCJSModuleCannotFindModule(context, jsPath);
+    }
+
     return nil;
 }
 
 - (nullable JSValue *)require:(NSString *)jsPath {
-    JSContext *currentContext = [JSContext currentContext];
+    JSContext *context = [JSContext currentContext];
+    return [self moduleByRequiringPath:jsPath context:context].exports ?: [JSValue valueWithUndefinedInContext:context];
+}
+
+- (nullable TCJSModule *)moduleByRequiringPath:(NSString *)jsPath context:(JSContext *)context {
     TCJSModule *module = [self.requireCache objectForKey:jsPath];
     if (!module) {
-        if ([jsPath hasSuffix:@".js"]) {
+        TCJSModule *(^globalModuleLoader)(JSContext *) = self.class.registeredGlobalModules[jsPath];
+        if (globalModuleLoader) {
+            module = globalModuleLoader(context);
+            module.loaded = YES;
+        } else {
             NSString *fullJSPath = [self resolve:jsPath];
             if (fullJSPath) {
                 module = [[TCJSModule alloc] initWithScriptContentsOfFile:fullJSPath loadPaths:self.paths];
-            }
-        } else {
-            TCJSModule *(^globalModuleLoader)(JSContext *) = self.class.registeredGlobalModules[jsPath];
-            if (globalModuleLoader) {
-                @autoreleasepool {
-                    module = globalModuleLoader(currentContext);
-                    module.loaded = YES;
-                }
             }
         }
 
         if (module) {
             [self.requireCache setObject:module forKey:jsPath];
         } else {
-            NSString *message = [NSString stringWithFormat:@"Can't load module: %@", jsPath];
-            currentContext.exception = [JSValue valueWithNewErrorFromMessage:message inContext:currentContext];
+            context.exception = TCJSModuleCannotFindModule(context, jsPath);
         }
     }
-    return module.exports ?: [JSValue valueWithUndefinedInContext:currentContext];
+
+    return module;
 }
 
 - (JSValue *)evaluateScript:(NSString *)script sourceURL:(nullable NSURL *)sourceURL context:(JSContext *)context {

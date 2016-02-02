@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)clearRequireCache;
 
 - (nullable NSString *)resolve:(NSString *)jsPath;
-- (nullable id)require:(NSString *)jsPath;
+- (nullable JSValue *)require:(NSString *)jsPath;
 
 @end
 
@@ -45,10 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)registerGlobalModuleNamed:(NSString *)globalModuleName
                         withBlock:(TCJSModule *_Nullable (^)(JSContext *context))block;
 
-+ (nullable instancetype)mainModuleOfContext:(JSContext *)context;
++ (nullable TCJSModule *)mainModuleOfContext:(JSContext *)context;
 
 + (instancetype)moduleWithExports:(id)exports;
-
 - (nullable instancetype)initWithScriptContentsOfFile:(nullable NSString *)path;
 - (nullable instancetype)initWithScriptContentsOfFile:(nullable NSString *)path
                                             loadPaths:(nullable NSArray<NSString *> *)loadPaths;
@@ -59,6 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
                           pool:(nullable NSMutableDictionary *)pool NS_DESIGNATED_INITIALIZER;
 
 - (JSValue *)evaluateScript:(NSString *)script sourceURL:(nullable NSURL *)sourceURL context:(JSContext *)context;
+- (nullable TCJSModule *)moduleByRequiringPath:(NSString *)jsPath context:(JSContext *)context;
 
 @end
 
