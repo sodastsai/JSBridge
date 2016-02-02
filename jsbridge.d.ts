@@ -173,4 +173,15 @@ declare namespace NEvents {  // This namespace is used as the exports of `requir
         listenerCount(event: string): number;
         emit(event: string, ...args: any[]): boolean;
     }
+
+    // NSNotification handler
+    interface EventCenterHandler {
+        (name: string, object: any, info: any): void;
+    }
+    interface EventCenterObserver {}
+    export interface EventCenter {
+        on(name: string, handler: EventCenterHandler): EventCenterObserver;
+        on(name: string, object: any, handler: EventCenterHandler): EventCenterObserver;
+        off(observer: EventCenterObserver);
+    }
 }
