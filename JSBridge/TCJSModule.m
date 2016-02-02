@@ -28,6 +28,7 @@
 @property (nonatomic, strong, readwrite) NSMutableArray<NSString *> *paths;
 
 @property (nonatomic, strong) JSManagedValue *managedExports;
+@property (nonatomic, strong) JSManagedValue *managedPool;
 
 @end
 
@@ -132,16 +133,16 @@
         _loaded = NO;
         _filename = path;
         _moduleID = [NSString randomStringByLength:32];
-        _pool = pool ?: [@{} mutableCopy];
 
         self.exports = [JSValue valueWithNewObjectInContext:context];
+        self.pool = [JSValue valueWithNewObjectInContext:context];
 
         // Load script
         if (path) {
             [_paths insertObject:path.stringByDeletingLastPathComponent atIndex:0];
         }
         if (script) {
-            [self evaluateScript:script sourceURL:path?[NSURL fileURLWithPath:path] : nil context:context];
+            [self evaluateScript:script sourceURL:path?[NSURL fileURLWithPath:path]:nil context:context];
             if (!(_loaded = context.exception == nil)) {
                 return self = nil;
             }
@@ -181,6 +182,28 @@
             NSAssert(context, @"Can't get a JSContext");
             self.managedExports = [JSManagedValue managedValueWithValue:exports];
             [context.virtualMachine addManagedReference:self.managedExports withOwner:self];
+        }
+    }
+}
+
+- (JSValue *)pool {
+    return self.managedPool.value ?: [JSValue valueWithUndefinedInContext:[JSContext currentContext]];
+}
+
+- (void)setPool:(JSValue *)pool {
+    @synchronized(self) {
+        if (self.managedPool && self.managedPool.value) {
+            JSContext *context = self.managedPool.value.context ?: [JSContext currentContext];
+            NSAssert(context, @"Can't get a JSContext");
+            [context.virtualMachine removeManagedReference:self.managedPool withOwner:self];
+            self.managedPool = nil;
+        }
+
+        if (pool) {
+            JSContext *context = pool.context ?: [JSContext currentContext];
+            NSAssert(context, @"Can't get a JSContext");
+            self.managedPool = [JSManagedValue managedValueWithValue:pool];
+            [context.virtualMachine addManagedReference:self.managedPool withOwner:self];
         }
     }
 }

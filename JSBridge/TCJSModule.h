@@ -29,9 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readonly) NSString *filename;
 @property (nonatomic, assign, readonly, getter=isLoaded) BOOL loaded;
-@property (nonatomic, nullable, readwrite) JSValue *exports;  // Delegate to JSManagedValue
 @property (nonatomic, strong, readonly) NSMutableArray<NSString *> *paths;
-@property (nonatomic, strong, readonly) NSMutableDictionary *pool;
+@property (nonatomic, nullable, readwrite) JSValue *exports;  // Delegate to JSManagedValue
+@property (nonatomic, nullable, readwrite) JSValue *pool;
 
 - (void)clearRequireCache;
 
@@ -57,8 +57,6 @@ NS_ASSUME_NONNULL_BEGIN
                      loadPaths:(nullable NSArray<NSString *> *)loadPaths
                        context:(nullable JSContext *)context
                           pool:(nullable NSMutableDictionary *)pool NS_DESIGNATED_INITIALIZER;
-
-@property (nonatomic, strong, readonly) NSMutableDictionary *pool;
 
 - (JSValue *)evaluateScript:(NSString *)script sourceURL:(nullable NSURL *)sourceURL context:(JSContext *)context;
 
