@@ -98,9 +98,9 @@ class UtilsTests: JSBridgeTests {
         XCTAssertEqual(self.context.evaluateScript("util.format('~%d=', new Date())").toString(), "~NaN=")
     }
 
-    func testInherits() {
+    func testInherits1() {
         self.context.evaluateScript("function A(name) { this.name = name; }")
-        self.context.evaluateScript("function B(name, gender) { this.gender = gender; A.call(this, name); }")
+        self.context.evaluateScript("function B(name, gender) { this.gender = gender; this.constructor.super_.call(this, name); }")
         self.context.evaluateScript("util.inherits(B, A);")
         self.context.evaluateScript("var b = new B('Peter', 'Male');")
         self.context.evaluateScript("A.prototype.hi = function() { return 'Hi, ' + this.name; }")
@@ -109,6 +109,16 @@ class UtilsTests: JSBridgeTests {
         XCTAssertTrue(self.context.evaluateScript("b instanceof A").toBool())
         XCTAssertFalse(self.context.evaluateScript("b instanceof Array").toBool())
         XCTAssertEqual(self.context.evaluateScript("b.constructor.super_;"), self.context.evaluateScript("A;"))
+    }
+
+    func testInherits2() {
+        let A = self.context.evaluateScript("function A(name) { this.name = name; }; A;")
+        let B = self.context.evaluateScript("function B(name, gender) { this.gender = gender; this.constructor.super_.call(this, name); }; B;")
+        self.context.evaluateScript("util.inherits(B, A);")
+
+        let b = B.constructWithArguments(["Peter", "Male"])
+        XCTAssertTrue(b.isInstanceOf(A))
+        XCTAssertTrue(b.isInstanceOf(B))
     }
 
     func testExtends1() {
@@ -129,5 +139,33 @@ class UtilsTests: JSBridgeTests {
 
         XCTAssertEqual(obj3, ["answer": 42, "gender": "Male", "name": "Peter"])
     }
-    
+
+    func testConstructorBuilder() {
+        let builderA = TCJSConstructorBuilder(name: "A")
+        builderA.addProperty("name", argumentName: "name", passToSuper: false)
+        let A = builderA.buildWithContext(self.context)
+
+        let builderB = TCJSConstructorBuilder(name: "B")
+        builderB.addProperty(nil, argumentName: "name", passToSuper: true)
+        builderB.addProperty("gender", argumentName: "gender", passToSuper: false)
+        let B = builderB.buildWithContext(self.context)
+
+        TCJSUtil.inherits(B, withSuperConstructor: A, context: self.context)
+
+        var greeting: String!
+        let block: @convention(block) () -> Void = {
+            greeting = "Hi, \(JSContext.currentThis().valueForProperty("name").toString())"
+        }
+        A.valueForProperty("prototype").setValue(unsafeBitCast(block, AnyObject.self), forProperty: "hi")
+
+        let a = A.constructWithArguments(["Rach"])
+        a.invokeMethod("hi", withArguments: [])
+        XCTAssertEqual(greeting, "Hi, Rach")
+
+        let b = B.constructWithArguments(["Peter", "Male"])
+        b.invokeMethod("hi", withArguments: [])
+        XCTAssertEqual(greeting, "Hi, Peter")
+        XCTAssertEqual(b.valueForProperty("gender").toString(), "Male")
+    }
+
 }

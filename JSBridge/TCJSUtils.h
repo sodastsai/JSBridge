@@ -22,6 +22,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class TCJSModule;
+
 @protocol TCJSUtilEnumerate <NSObject>
 
 + (NSArray<NSString *> *)enumerableJSProperties;
@@ -43,6 +45,41 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<NSString *> *)arrayWithPropertiesOfValue:(JSValue *)value context:(JSContext *)context;
 
 + (JSValue *)extends:(JSValue *)object withObjects:(NSArray<JSValue *> *)objects context:(JSContext *)context;
+
++ (void)defineProperty:(NSString *)property
+            enumerable:(BOOL)enumerable
+          configurable:(BOOL)configurable
+              writable:(BOOL)writable
+                 value:(nullable id)value
+                getter:(nullable id _Nullable(^)(void))getter
+                setter:(nullable void(^)(id _Nullable))setter
+              forValue:(JSValue *)jsValue;
+
++ (JSValue *)inherits:(JSValue *)constructor
+ withSuperConstructor:(JSValue *)superConstructor
+              context:(JSContext *)context;
+
++ (void)defineProperty:(NSString *)property
+              forValue:(JSValue *)value
+ withNativeObjectNamed:(NSString *)nativeObjectName
+               keyPath:(NSString *)keyPath
+              readonly:(BOOL)readonly;
+
++ (void)defineReadonlyProperty:(NSString *)property forJSValue:(JSValue *)jsValue withValue:(id)value;
+
+@end
+
+@interface TCJSConstructorBuilder : NSObject
+
++ (instancetype)constructorBuilderWithName:(NSString *)name;
+- (instancetype)initWithName:(NSString *)name NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
+
+- (void)addProperty:(nullable NSString *)property argumentName:(NSString *)argument passToSuper:(BOOL)toSuper;
+
+@property (nonatomic, readonly) NSString *script;
+- (JSValue *)buildWithContext:(JSContext *)context;
+- (JSValue *)buildWithModule:(TCJSModule *)module context:(JSContext *)context;
 
 @end
 

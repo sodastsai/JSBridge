@@ -21,6 +21,6 @@ Pod::Spec.new do |s|
   s.resources            = 'JSBridge/**/*.{js}'
   s.preserve_paths       = 'jsbridge.d.ts'
 
-  s.dependency 'BenzeneFoundation/UIKit', '~> 0.5.41'
+  s.dependency 'BenzeneFoundation/UIKit', '~> 0.5.42'
   s.dependency 'libextobjc'
 end

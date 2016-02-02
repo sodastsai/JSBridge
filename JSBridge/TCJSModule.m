@@ -39,20 +39,6 @@ TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSStr
 
 @implementation TCJSModule
 
-+ (void)loadExtensionForJSContext:(JSContext *)context {
-    TCJSModule *module = [[TCJSModule alloc]
-                          initWithScript:nil
-                          sourceFile:nil
-                          loadPaths:@[[NSBundle mainBundle].bundlePath,
-                                      [NSBundle bundleForClass:TCJSModule.class].bundlePath]
-                          context:context
-                          pool:nil];
-    module.filename = @".";
-    module.loaded = YES;
-    context[@"module"] = module;
-    context[@"require"] = ^(NSString *path){ return [module require:path]; };
-}
-
 + (NSMutableDictionary<NSString *, TCJSModule *(^)(JSContext *)> *)registeredGlobalModules {
     static NSMutableDictionary *registeredGlobalModules;
     static dispatch_once_t onceToken;
@@ -80,8 +66,6 @@ TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSStr
 #pragma mark - Object Lifecycle
 
 + (void)load {
-    TCJSJavaScriptContextRegisterExtension(self);
-
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationDidReceiveMemoryWarning:)
                                                  name:UIApplicationDidReceiveMemoryWarningNotification
@@ -94,18 +78,20 @@ TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSStr
     return module;
 }
 
-- (instancetype)initWithScriptContentsOfFile:(NSString *)path {
-    return self = [self initWithScriptContentsOfFile:path loadPaths:nil];
+- (instancetype)initWithScriptContentsOfFile:(NSString *)path context:(nullable JSContext *)context {
+    return self = [self initWithScriptContentsOfFile:path loadPaths:nil context:context];
 }
 
-- (instancetype)initWithScriptContentsOfFile:(NSString *)path loadPaths:(nullable NSArray<NSString *> *)loadPaths {
+- (instancetype)initWithScriptContentsOfFile:(NSString *)path
+                                   loadPaths:(nullable NSArray<NSString *> *)loadPaths
+                                     context:(nullable JSContext *)context{
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
         NSString *scriptContent = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
         if (scriptContent) {
             return self = [self initWithScript:scriptContent
                                     sourceFile:path
                                      loadPaths:loadPaths
-                                       context:nil
+                                       context:context
                                           pool:nil];
         }
     }
@@ -114,6 +100,10 @@ TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSStr
 
 - (instancetype)init {
     return self = [self initWithScript:nil sourceFile:nil loadPaths:nil context:nil pool:nil];
+}
+
+- (nullable instancetype)initWithContext:(JSContext *)context {
+    return self = [self initWithScript:nil sourceFile:nil loadPaths:nil context:context pool:nil];
 }
 
 - (instancetype)initWithScript:(NSString *)script
@@ -128,9 +118,10 @@ TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSStr
             TCJSModule *mainModule = [TCJSModule mainModuleOfContext:context];
             if (mainModule) {
                 loadPaths = mainModule.paths;
+            } else {
+                loadPaths = @[];
             }
         }
-        NSAssert(loadPaths, @"There's no global module ... loadPaths must be set");
         NSAssert(context, @"Cann't find a JSContext");
 
         // Initialize
@@ -151,6 +142,8 @@ TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSStr
             if (!(_loaded = context.exception == nil)) {
                 return self = nil;
             }
+        } else {
+            _loaded = YES;
         }
     }
     return self;
@@ -276,7 +269,9 @@ TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSStr
         } else {
             NSString *fullJSPath = [self resolve:jsPath];
             if (fullJSPath) {
-                module = [[TCJSModule alloc] initWithScriptContentsOfFile:fullJSPath loadPaths:self.paths];
+                module = [[TCJSModule alloc] initWithScriptContentsOfFile:fullJSPath
+                                                                loadPaths:self.paths
+                                                                  context:context];
             }
         }
 
@@ -297,7 +292,7 @@ TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSStr
                                   @"    return function(module) {\n"
                                   @"        return (function _moduleContext() {  // `this` is `module`\n"
                                   @"            function _require(path) {\n"
-                                  @"                return module.require(path);"
+                                  @"                return module.require(path);\n"
                                   @"            }\n"
                                   @"            return (function _body(module, exports, require) {\n"
                                   @"                /* --- Start of Script Body --- */\n"

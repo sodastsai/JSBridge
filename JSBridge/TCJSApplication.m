@@ -21,6 +21,8 @@
 #import <UIKit/UIKit.h>
 #import <BenzeneFoundation/BenzeneUIKit.h>
 #import "TCJSConsole.h"
+#import "TCJSModule.h"
+#import "TCJSUtils.h"
 
 @protocol TCJSApplication <JSExport>
 
@@ -38,7 +40,12 @@
 
 @interface TCJSApplication () <TCJSApplication>
 
+@property (nonatomic, strong, readonly) NSMutableSet<JSContext *> *contextPool;
+
 @end
+
+NSString *const TCJSApplicationBecomeActiveJSEventName = @"becomeActive";
+NSString *const TCJSApplicationResignActiveJSEventName = @"resignActive";
 
 @implementation TCJSApplication
 
@@ -49,7 +56,39 @@
 }
 
 + (void)loadExtensionForJSContext:(JSContext *)context {
-    context[@"application"] = [TCJSApplication currentApplication];
+    TCJSModule *module = context[@"module"].toObject;
+
+    JSValue *EventEmitter = [module moduleByRequiringPath:@"events" context:context].exports[@"EventEmitter"];
+
+    TCJSConstructorBuilder *builder = [TCJSConstructorBuilder constructorBuilderWithName:@"Application"];
+    [builder addProperty:@"_nativeObject" argumentName:@"nativeObject" passToSuper:NO];
+    JSValue *Application = [builder buildWithContext:context];
+    [TCJSUtil inherits:Application withSuperConstructor:EventEmitter context:context];
+
+    BFObjectInspectionEnumeratePropertyOfProtocol(@protocol(TCJSApplication), ^(objc_property_t  _Nonnull property,
+                                                                                const char * _Nonnull propertyName,
+                                                                                ext_propertyAttributes * _Nonnull attr,
+                                                                                Protocol * _Nonnull ProtocolOfProperty,
+                                                                                BOOL * _Nonnull stop) {
+        [TCJSUtil defineProperty:@(propertyName)
+                        forValue:Application[@"prototype"]
+           withNativeObjectNamed:@"_nativeObject"
+                         keyPath:@(propertyName)
+                        readonly:YES];
+    });
+    [TCJSUtil defineReadonlyProperty:TCJSApplicationBecomeActiveJSEventName
+                          forJSValue:Application[@"prototype"]
+                           withValue:TCJSApplicationBecomeActiveJSEventName];
+    [TCJSUtil defineReadonlyProperty:TCJSApplicationResignActiveJSEventName
+                          forJSValue:Application[@"prototype"]
+                           withValue:TCJSApplicationResignActiveJSEventName];
+
+    context[@"application"] = [Application constructWithArguments:@[[TCJSApplication currentApplication]]];
+    [[TCJSApplication currentApplication].contextPool addObject:context];
+}
+
++ (void)deactivateExtensionForJSContext:(JSContext *)context {
+    [[TCJSApplication currentApplication].contextPool removeObject:context];
 }
 
 + (instancetype)currentApplication {
@@ -64,16 +103,47 @@
 - (instancetype)init {
     if (self = [super init]) {
         _console = [[TCJSConsole alloc] init];
+        _contextPool = [NSMutableSet setWithCapacity:1];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationDidBecomeActive:)
+                                                     name:UIApplicationDidBecomeActiveNotification
+                                                   object:[UIApplication sharedApplication]];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationWillResignActive:)
+                                                     name:UIApplicationWillResignActiveNotification
+                                                   object:[UIApplication sharedApplication]];
     }
     return self;
 }
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+#pragma mark - Notifications
+
+- (void)applicationDidBecomeActive:(NSNotification *)notification {
+    for (JSContext *context in self.contextPool) {
+        [context[@"application"] invokeMethod:@"emit" withArguments:@[TCJSApplicationBecomeActiveJSEventName]];
+    }
+}
+
+- (void)applicationWillResignActive:(NSNotification *)notification {
+    for (JSContext *context in self.contextPool) {
+        [context[@"application"] invokeMethod:@"emit" withArguments:@[TCJSApplicationResignActiveJSEventName]];
+    }
+}
+
+#pragma mark - Properties
 
 - (NSString *)version {
     return [NSBundle mainBundle].infoDictionary[@"CFBundleShortVersionString"];
 }
 
 - (NSString *)name {
-    return [NSBundle mainBundle].infoDictionary[@"CFBundleDisplayName"];
+    NSDictionary *bundleInfo = [NSBundle mainBundle].infoDictionary;
+    return bundleInfo[@"CFBundleDisplayName"] ?: bundleInfo[@"CFBundleName"];
 }
 
 - (NSString *)build {

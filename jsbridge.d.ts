@@ -31,7 +31,7 @@ declare const require: IRequireFunc;  // Import/Load other scripts in.
 
 
 // Application and System ----------------------------------------------------------------------------------------------
-declare const application: {
+interface IApplication extends NEvents.EventEmitter {
     // An object representing current application
     version: string;  // Verison of current app
     build: string;  // Build number of current app
@@ -48,7 +48,12 @@ declare const application: {
         warn(...params: any[]);
         error(...params: any[]);
     };  // App console
-};
+
+    // Event name
+    becomeActive: string;  // Readonly
+    resignActive: string;  // Readonly
+}
+declare const application: IApplication;
 declare const system: {
     // An object representing current OS and device
     version: string;  // Version of current OS

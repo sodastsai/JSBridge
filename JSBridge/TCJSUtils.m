@@ -25,8 +25,7 @@
 
 + (void)load {
     [TCJSModule registerGlobalModuleNamed:@"util" withBlock:^TCJSModule *(JSContext *context) {
-        NSString *jsImplPath = [[NSBundle bundleForClass:TCJSUtil.class] pathForResource:@"TCJSUtils" ofType:@"js"];
-        TCJSModule *module = [[TCJSModule alloc] initWithScriptContentsOfFile:jsImplPath];
+        TCJSModule *module = [[TCJSModule alloc] initWithContext:context];
         module.exports[@"toString"] = ^(JSValue *obj) {
             return [TCJSUtil toString:obj context:[JSContext currentContext]];
         };
@@ -90,6 +89,12 @@
                              withObjects:[arguments subarrayFromIndex:1]
                                  context:[JSContext currentContext]];
             }
+        };
+
+        module.exports[@"inherits"] = ^JSValue *_Nullable(JSValue *Constructor, JSValue *SuperConstructor) {
+            return [TCJSUtil inherits:Constructor
+                 withSuperConstructor:SuperConstructor
+                              context:[JSContext currentContext]];
         };
 
         return module;
@@ -253,6 +258,152 @@
     [arguments addObject:object];
     [arguments addObjectsFromArray:objects];
     return [context[@"Object"] invokeMethod:@"assign" withArguments:arguments];
+}
+
++ (void)defineProperty:(NSString *)property
+            enumerable:(BOOL)enumerable
+          configurable:(BOOL)configurable
+              writable:(BOOL)writable
+                 value:(id)value
+                getter:(nullable id _Nullable(^)(void))getter
+                setter:(nullable void(^)(id _Nullable))setter
+              forValue:(JSValue *)jsValue {
+    NSMutableDictionary *descriptor = [@{
+        JSPropertyDescriptorEnumerableKey: @(enumerable),
+        JSPropertyDescriptorConfigurableKey: @(configurable),
+    } mutableCopy];
+    if (value) {
+        descriptor[JSPropertyDescriptorValueKey] = value;
+    }
+    if (getter) {
+        descriptor[JSPropertyDescriptorGetKey] = getter;
+    }
+    if (setter) {
+        descriptor[JSPropertyDescriptorSetKey] = setter;
+    }
+    if (!getter && !setter) {
+        descriptor[JSPropertyDescriptorWritableKey] = @(writable);
+    }
+    [jsValue defineProperty:property descriptor:descriptor];
+}
+
++ (void)defineProperty:(NSString *)property
+              forValue:(JSValue *)value
+ withNativeObjectNamed:(NSString *)nativeObjectName
+               keyPath:(NSString *)keyPath
+              readonly:(BOOL)readonly {
+    [self defineProperty:property
+              enumerable:YES
+            configurable:NO
+                writable:!readonly
+                   value:nil
+                  getter:^id _Nullable{
+                      return [[[JSContext currentThis][nativeObjectName] toObject] valueForKeyPath:keyPath];
+                  } setter:readonly ? nil : ^(id _Nullable _value) {
+                      [[[JSContext currentThis][nativeObjectName] toObject] setValue:_value forKey:keyPath];
+                  } forValue:value];
+}
+
++ (void)defineReadonlyProperty:(NSString *)property forJSValue:(JSValue *)jsValue withValue:(id)value {
+    [self defineProperty:property
+              enumerable:YES configurable:NO writable:NO
+                   value:value getter:nil setter:nil
+                forValue:jsValue];
+}
+
++ (JSValue *)inherits:(JSValue *)constructor
+ withSuperConstructor:(JSValue *)superConstructor
+              context:(JSContext *)context {
+    return [[context evaluateScript:
+             @"(function() {\n"
+             @"    return function(c, sc) {\n"
+             @"        c.super_ = sc;\n"
+             @"        return Object.setPrototypeOf(c.prototype, sc.prototype);\n"
+             @"    };\n"
+             @"})();"] callWithArguments:@[constructor, superConstructor]];
+}
+
+@end
+
+#pragma mark - Constructor Builder
+
+@interface TCJSConstructorBuilder ()
+
+@property (nonatomic, strong, readonly) NSString *name;
+
+@property (nonatomic, strong) NSMutableArray<BFPair<NSString *, NSString *> *> *properties;
+@property (nonatomic, strong) NSMutableArray<NSString *> *superArguments;
+
+@end
+
+@implementation TCJSConstructorBuilder
+
++ (instancetype)constructorBuilderWithName:(NSString *)name {
+    return [[TCJSConstructorBuilder alloc] initWithName:name];
+}
+
+- (instancetype)initWithName:(NSString *)name {
+    if (self = [super init]) {
+        _name = name;
+        _properties = [[NSMutableArray alloc] init];
+        _superArguments = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
+
+- (void)addProperty:(nullable NSString *)property argumentName:(NSString *)argument passToSuper:(BOOL)toSuper {
+    [self.properties addObject:[BFPair<NSString *, NSString *> pairWithObject:property
+                                                                    andObject:argument]];
+    if (toSuper) {
+        [self.superArguments addObject:argument];
+    }
+}
+
+- (NSArray<NSString *> *)constructorArguments {
+    NSMutableArray<NSString *> *result = [[NSMutableArray alloc] initWithCapacity:self.properties.count];
+    [self.properties enumerateObjectsUsingBlock:^(BFPair<NSString *,NSString *> *pair, NSUInteger idx, BOOL *stop) {
+        [result addObject:pair.secondObject];
+    }];
+    return [NSArray arrayWithArray:result];
+}
+
+- (NSString *)propertySetupStringWithPadding:(NSUInteger)padding {
+    NSMutableString *paddingString = [[NSMutableString alloc] initWithCapacity:padding];
+    for (NSUInteger i=0; i<padding; i++) {
+        [paddingString appendString:@" "];
+    }
+
+    NSMutableArray<NSString *> *result = [[NSMutableArray alloc] initWithCapacity:self.properties.count];
+    [self.properties enumerateObjectsUsingBlock:^(BFPair<NSString *,NSString *> *pair, NSUInteger idx, BOOL *stop) {
+        if (pair.firstObject) {
+            [result addObject:BFFormatString(@"%@this.%@ = %@;", paddingString, pair.firstObject, pair.secondObject)];
+        }
+    }];
+    return [result componentsJoinedByString:@"\n"];
+}
+
+- (NSString *)script {
+    NSMutableString *script = [NSMutableString stringWithFormat:
+                               @"function %@(%@) {\n"
+                               @"    if (typeof this.constructor.super_ !== 'undefined' && \n"
+                               @"        this.constructor.super_ !== arguments.callee) {\n"
+                               @"        this.constructor.super_.apply(this, [%@]);\n"
+                               @"    }\n"
+                               @"%@\n"
+                               @"}",
+                               self.name,
+                               [self.constructorArguments componentsJoinedByString:@", "],
+                               [self.superArguments componentsJoinedByString:@", "],
+                               [self propertySetupStringWithPadding:4]];
+    return [NSString stringWithString:script];
+}
+
+- (JSValue *)buildWithContext:(JSContext *)context {
+    return [context evaluateScript:[NSString stringWithFormat:@"(function() { return %@; })();", self.script]];
+}
+
+- (JSValue *)buildWithModule:(TCJSModule *)module context:(JSContext *)context {
+    return [module evaluateScript:[NSString stringWithFormat:@"return %@;", self.script] sourceURL:nil context:context];
 }
 
 @end

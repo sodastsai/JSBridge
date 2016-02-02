@@ -1,7 +1,7 @@
 PODS:
-  - BenzeneFoundation/Foundation (0.5.41):
+  - BenzeneFoundation/Foundation (0.5.42):
     - libextobjc (~> 0.4)
-  - BenzeneFoundation/UIKit (0.5.41):
+  - BenzeneFoundation/UIKit (0.5.42):
     - BenzeneFoundation/Foundation
     - libextobjc (~> 0.4)
   - libextobjc (0.4.1):
@@ -40,7 +40,7 @@ PODS:
   - libextobjc/RuntimeExtensions (0.4.1)
   - libextobjc/UmbrellaHeader (0.4.1)
   - TCJSBridge (0.0.1):
-    - BenzeneFoundation/UIKit (~> 0.5.41)
+    - BenzeneFoundation/UIKit (~> 0.5.42)
     - libextobjc
 
 DEPENDENCIES:
@@ -51,8 +51,8 @@ EXTERNAL SOURCES:
     :path: "."
 
 SPEC CHECKSUMS:
-  BenzeneFoundation: acb3591714d945e87480b85f918c5e17a49e7cd1
+  BenzeneFoundation: 7a44807ff32cd32d8776deccf2b7fd2f92ed8159
   libextobjc: a650fc1bf489a3d3a9bc2e621efa3e1006fc5471
-  TCJSBridge: 6933464625c962a319bc23a65f6debaf1ab89237
+  TCJSBridge: 2f212228c85c33de3911c73b189a67ff824dd9ab
 
 COCOAPODS: 0.39.0

@@ -18,6 +18,7 @@
 //
 
 #import "TCJSJavaScriptContext.h"
+#import "TCJSModule.h"
 #import <objc/runtime.h>
 
 TCJS_EXTERN NSMutableSet<Class> *TCJSJavaScriptContextRegisteredExtensions();
@@ -26,6 +27,22 @@ TCJS_EXTERN NSMutableSet<Class> *TCJSJavaScriptContextRegisteredExtensions();
 
 TCJS_EXTERN void TCJSJavaScriptContextSetupContext(JSContext *context) {
     context[@"global"] = context[@"root"] = context.globalObject;
+
+    // Global module
+    TCJSModule *module = [[TCJSModule alloc]
+                          initWithScript:nil
+                          sourceFile:nil
+                          loadPaths:@[[NSBundle mainBundle].bundlePath,
+                                      [NSBundle bundleForClass:TCJSModule.class].bundlePath]
+                          context:context
+                          pool:nil];
+    context[@"module"] = module;
+    context[@"require"] = ^JSValue *_Nullable(NSString *path){
+        TCJSModule *module = [[JSContext currentContext][@"module"] toObjectOfClass:[TCJSModule class]];
+        return [module require:path];
+    };
+
+    // Load extensions
     for (Class ExtClass in TCJSJavaScriptContextRegisteredExtensions()) {
         [ExtClass loadExtensionForJSContext:context];
     }

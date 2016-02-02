@@ -29,7 +29,8 @@
 + (void)load {
     [TCJSModule registerGlobalModuleNamed:@"events" withBlock:^TCJSModule *(JSContext *context) {
         return [[TCJSModule alloc] initWithScriptContentsOfFile:[[NSBundle bundleForClass:TCJSEvents.class]
-                                                                 pathForResource:@"TCJSEvents" ofType:@"js"]];
+                                                                 pathForResource:@"TCJSEvents" ofType:@"js"]
+                                                        context:context];
     }];
 }
 

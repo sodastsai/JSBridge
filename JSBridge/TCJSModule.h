@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface TCJSModule : NSObject <TCJSModule, TCJSJavaScriptContextExtension>
+@interface TCJSModule : NSObject <TCJSModule>
 
 + (void)registerGlobalModuleNamed:(NSString *)globalModuleName
                         withBlock:(TCJSModule *_Nullable (^)(JSContext *context))block;
@@ -48,9 +48,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable TCJSModule *)mainModuleOfContext:(JSContext *)context;
 
 + (instancetype)moduleWithExports:(id)exports;
-- (nullable instancetype)initWithScriptContentsOfFile:(nullable NSString *)path;
+- (nullable instancetype)initWithContext:(JSContext *)context;
+- (nullable instancetype)initWithScriptContentsOfFile:(nullable NSString *)path context:(nullable JSContext *)context;
 - (nullable instancetype)initWithScriptContentsOfFile:(nullable NSString *)path
-                                            loadPaths:(nullable NSArray<NSString *> *)loadPaths;
+                                            loadPaths:(nullable NSArray<NSString *> *)loadPaths
+                                              context:(nullable JSContext *)context;
 - (instancetype)initWithScript:(nullable NSString *)script
                     sourceFile:(nullable NSString *)path
                      loadPaths:(nullable NSArray<NSString *> *)loadPaths
