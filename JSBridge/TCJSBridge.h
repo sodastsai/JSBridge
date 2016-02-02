@@ -17,6 +17,8 @@
 //  limitations under the License.
 //
 
+// See: WWDC 2013 Session 615 https://developer.apple.com/videos/play/wwdc2013-615/
+
 #import <TCJSBridge/TCJSJavaScriptContext.h>
 #import <TCJSBridge/TCJSModule.h>
 #import <TCJSBridge/TCJSUtils.h>

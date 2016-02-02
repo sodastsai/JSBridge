@@ -28,7 +28,6 @@
 @property (nonatomic, strong, readwrite) NSMutableArray<NSString *> *paths;
 
 @property (nonatomic, strong) JSManagedValue *managedExports;
-@property (nonatomic, strong) JSValue *exports1;
 
 @end
 
@@ -200,8 +199,12 @@
 - (NSCache<NSString *, TCJSModule *> *)requireCache {
     NSCache<NSString *, TCJSModule *> *requiredCache = self.class.sharedRequireCache[self.moduleID];
     if (!requiredCache) {
-        requiredCache = self.class.sharedRequireCache[self.moduleID] = [[NSCache alloc] init];
-        requiredCache.countLimit = 10;
+        @synchronized(self) {
+            if (!requiredCache) {
+                requiredCache = self.class.sharedRequireCache[self.moduleID] = [[NSCache alloc] init];
+                requiredCache.countLimit = 10;
+            }
+        }
     }
     return requiredCache;
 }
