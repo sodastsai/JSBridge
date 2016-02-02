@@ -56,7 +56,7 @@ NSString *const TCJSApplicationResignActiveJSEventName = @"resignActive";
 }
 
 + (void)loadExtensionForJSContext:(JSContext *)context {
-    TCJSModule *module = context[@"module"].toObject;
+    TCJSModule *module = [[TCJSModule alloc] initWithContext:context];
 
     JSValue *EventEmitter = [module moduleByRequiringPath:@"events" context:context].exports[@"EventEmitter"];
 
@@ -83,7 +83,8 @@ NSString *const TCJSApplicationResignActiveJSEventName = @"resignActive";
                           forJSValue:Application[@"prototype"]
                            withValue:TCJSApplicationResignActiveJSEventName];
 
-    context[@"application"] = [Application constructWithArguments:@[[TCJSApplication currentApplication]]];
+    context[@"application"] = module.exports = [Application
+                                                constructWithArguments:@[[TCJSApplication currentApplication]]];
     [[TCJSApplication currentApplication].contextPool addObject:context];
 }
 
