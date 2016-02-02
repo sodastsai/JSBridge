@@ -59,11 +59,11 @@ NSString *const TCJSApplicationResignActiveJSEventName = @"resignActive";
     TCJSModule *module = [[TCJSModule alloc] initWithContext:context];
 
     JSValue *EventEmitter = [module moduleByRequiringPath:@"events" context:context].exports[@"EventEmitter"];
+    JSValue *application = [EventEmitter constructWithArguments:@[]];
 
-    TCJSConstructorBuilder *builder = [TCJSConstructorBuilder constructorBuilderWithName:@"Application"];
-    [builder addProperty:@"_nativeObject" argumentName:@"nativeObject" passToSuper:NO];
-    JSValue *Application = [builder buildWithContext:context];
-    [TCJSUtil inherits:Application withSuperConstructor:EventEmitter context:context];
+    [TCJSUtil defineReadonlyProperty:@"_nativeObject"
+                          forJSValue:application
+                           withValue:[TCJSApplication currentApplication]];
 
     BFObjectInspectionEnumeratePropertyOfProtocol(@protocol(TCJSApplication), ^(objc_property_t  _Nonnull property,
                                                                                 const char * _Nonnull propertyName,
@@ -71,20 +71,19 @@ NSString *const TCJSApplicationResignActiveJSEventName = @"resignActive";
                                                                                 Protocol * _Nonnull ProtocolOfProperty,
                                                                                 BOOL * _Nonnull stop) {
         [TCJSUtil defineProperty:@(propertyName)
-                        forValue:Application[@"prototype"]
+                        forValue:application
            withNativeObjectNamed:@"_nativeObject"
                          keyPath:@(propertyName)
                         readonly:YES];
     });
     [TCJSUtil defineReadonlyProperty:TCJSApplicationBecomeActiveJSEventName
-                          forJSValue:Application[@"prototype"]
+                          forJSValue:application
                            withValue:TCJSApplicationBecomeActiveJSEventName];
     [TCJSUtil defineReadonlyProperty:TCJSApplicationResignActiveJSEventName
-                          forJSValue:Application[@"prototype"]
+                          forJSValue:application
                            withValue:TCJSApplicationResignActiveJSEventName];
 
-    context[@"application"] = module.exports = [Application
-                                                constructWithArguments:@[[TCJSApplication currentApplication]]];
+    context[@"application"] = module.exports = application;
     [[TCJSApplication currentApplication].contextPool addObject:context];
 }
 
