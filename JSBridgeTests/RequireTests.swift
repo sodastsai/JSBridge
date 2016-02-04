@@ -55,6 +55,7 @@ class RequireTests: JSBridgeTests {
         XCTAssertEqual(globalObject.valueForProperty("overrided").toNumber(), 44)
 
         XCTAssertFalse(globalObject.valueForProperty("test").valueForProperty("requireFuncCmp").toBool())
+        XCTAssertTrue(globalObject.valueForProperty("test").valueForProperty("moduleRequireFuncCmp").toBool())
         XCTAssertFalse(globalObject.valueForProperty("test").valueForProperty("resolveFuncCmp").toBool())
         XCTAssertTrue(globalObject.valueForProperty("test").valueForProperty("requireCacheCmp").toBool())
         XCTAssertTrue(globalObject.valueForProperty("test").valueForProperty("requireExtensionsCmp").toBool())

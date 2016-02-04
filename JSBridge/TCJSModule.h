@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly, getter=isLoaded) BOOL loaded;
 @property (nonatomic, strong, readonly) NSMutableArray<NSString *> *paths;
 @property (nonatomic, nullable, readwrite) JSValue *exports;  // Delegate to JSManagedValue
+@property (nonatomic, nullable, readwrite) JSValue *require;  // Delegate to JSManagedValue
 
 @end
 
@@ -50,7 +51,7 @@ typedef BOOL(^TCJSModuleLoader)(TCJSModule *module, NSString *filepath, JSContex
 
 @end
 
-@interface TCJSRequire : NSObject <TCJSJavaScriptContextExtension>
+@interface TCJSRequire : NSObject
 
 + (JSValue *)globalRequireFunctionInContext:(JSContext *)context;
 + (JSValue *)createNewRequireFunctionForModule:(TCJSModule *)module context:(JSContext *)context;

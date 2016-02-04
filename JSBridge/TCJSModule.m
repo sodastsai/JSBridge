@@ -29,8 +29,11 @@
 @property (nonatomic, strong, readwrite) NSMutableArray<NSString *> *paths;
 
 @property (nonatomic, strong) JSManagedValue *managedExports;
+@property (nonatomic, strong) JSManagedValue *managedRequire;
 
 + (NSMutableDictionary<NSString *, TCJSModule *(^)(JSContext *)> *)registeredGlobalModules;
+
+- (instancetype)initWithContentOfFile:(NSString *)path loader:(TCJSModuleLoader)loader context:(JSContext *)context;
 
 @end
 
@@ -44,10 +47,6 @@ NSString *const TCJSRequireExtensionsKey = @"extensions";
 NSString *const TCJSRequireCacheKey = @"cache";
 
 @implementation TCJSRequire
-
-+ (void)loadExtensionForJSContext:(JSContext *)context {
-    [self globalRequireFunctionInContext:context];
-}
 
 + (void)registerModuleLoader:(nullable TCJSModuleLoader)moduleLoader
                 forExtension:(NSString *)pathExtension
@@ -127,13 +126,8 @@ NSString *const TCJSRequireCacheKey = @"cache";
     TCJSModule *module = [self loadedModulesInContext:context][fullJSPath];
     if (!module) {
         if (moduleLoader) {
-            module = [[TCJSModule alloc] initWithContext:context];
-            if (!(module.loaded = moduleLoader(module, fullJSPath, context) && context.exception == nil)) {
-                module.filename = fullJSPath;
-                module = nil;
-            }
-        } else {
-            // No module loader ... is global module
+            module = [[TCJSModule alloc] initWithContentOfFile:fullJSPath loader:moduleLoader context:context];
+        } else {  // No module loader ... is global module
             module = TCJSModule.registeredGlobalModules[fullJSPath](context);
         }
     }
@@ -145,11 +139,11 @@ NSString *const TCJSRequireCacheKey = @"cache";
 
 + (JSValue *)globalRequireFunctionInContext:(JSContext *)context {
     JSValue *require = context[@"require"];
-    if (!require || require.isUndefined) {
-        require = context[@"require"] = [self createNewRequireFunctionForModule:[TCJSModule mainModuleOfContext:context]
-                                                                        context:context];
-        [self registerDefaultModuleLoaderForContext:context];
+    if (require.isUndefined) {
+        require = context[@"module"][@"require"];
     }
+
+    NSAssert(!require.isUndefined, @"Can't get global require");
     return require;
 }
 
@@ -164,19 +158,19 @@ NSString *const TCJSRequireCacheKey = @"cache";
                 NSURL *sourceURL = [NSURL fileURLWithPath:filepath];
                 NSString *paddedScript = [NSString stringWithFormat:
                                           @"(function() {\n"
-                                          @"    return (function(exports, module, require, __filename, __dirname) {\n"
+                                          @"    return (function(module, exports, require, __filename, __dirname) {\n"
                                           @"        /* --- Start of Script Body --- */\n"
                                           @"%@\n"
                                           @"        /* --- End of Script Body --- */\n"
-                                          @"    }).apply(arguments[0], arguments);\n"
+                                          @"    }).apply(arguments[1], arguments);\n"
                                           @"});\n", script];
                 JSValue *scriptLoader = (sourceURL ?
                                          [context evaluateScript:paddedScript withSourceURL:sourceURL] :
                                          [context evaluateScript:paddedScript]);
                 return [scriptLoader callWithArguments:@[
-                    module.exports,
                     module,
-                    [self createNewRequireFunctionForModule:module context:context],
+                    module.exports,
+                    module.require,
                     sourceURL.path,
                     sourceURL.path.stringByDeletingLastPathComponent
                 ]];
@@ -222,11 +216,11 @@ NSString *const TCJSRequireCacheKey = @"cache";
 }
 
 + (JSValue *)createNewRequireFunctionForModule:(TCJSModule *)module context:(JSContext *)context {
-    BOOL globalModule = [[TCJSModule mainModuleOfContext:context] isEqual:module];
-
     JSValue *require = [JSValue valueWithObject:^(NSString *jsPath){
         return [TCJSRequire loadModuleByPath:jsPath parentModule:module context:[JSContext currentContext]].exports;
     } inContext:context];
+
+
     require[@"resolve"] = ^(NSString *jsPath) {
         JSContext *context = [JSContext currentContext];
         NSString *fullJSPath = [TCJSRequire resolve:jsPath parentModule:module loader:NULL context:context];
@@ -237,30 +231,34 @@ NSString *const TCJSRequireCacheKey = @"cache";
         return fullJSPath;
     };
 
-    if (globalModule) {
+    BOOL globalRequire = context[@"require"].isUndefined;
+    if (globalRequire) {
         require[TCJSRequireExtensionsKey] = [JSValue valueWithNewObjectInContext:context];
         require[TCJSRequireCacheKey] = [JSValue valueWithNewObjectInContext:context];
+
+        context[@"require"] = require;
+        require[@"main"] = module;
+
+        [self registerDefaultModuleLoaderForContext:context];
     } else {
-        [TCJSUtil defineProperty:TCJSRequireExtensionsKey
-                      enumerable:YES
-                    configurable:NO
-                        writable:NO
-                           value:nil
-                          getter:^id _Nullable{
-                              return [JSContext currentContext][@"require"][TCJSRequireExtensionsKey];
-                          }
-                          setter:nil
-                        forValue:require];
-        [TCJSUtil defineProperty:TCJSRequireCacheKey
-                      enumerable:YES
-                    configurable:NO
-                        writable:NO
-                           value:nil
-                          getter:^id _Nullable{
-                              return [JSContext currentContext][@"require"][TCJSRequireCacheKey];
-                          }
-                          setter:nil
-                        forValue:require];
+        [TCJSUtil
+         defineProperty:TCJSRequireExtensionsKey
+         enumerable:YES
+         configurable:NO
+         writable:NO
+         value:nil
+         getter:^id _Nullable{ return [JSContext currentContext][@"require"][TCJSRequireExtensionsKey]; }
+         setter:nil
+         forValue:require];
+        [TCJSUtil
+         defineProperty:TCJSRequireCacheKey
+         enumerable:YES
+         configurable:NO
+         writable:NO
+         value:nil
+         getter:^id _Nullable{ return [JSContext currentContext][@"require"][TCJSRequireCacheKey]; }
+         setter:nil
+         forValue:require];
     }
 
     return require;
@@ -330,6 +328,7 @@ NSString *const TCJSRequireCacheKey = @"cache";
         }
 
         self.exports = [JSValue valueWithNewObjectInContext:context];
+        self.require = [TCJSRequire createNewRequireFunctionForModule:self context:context];
     }
     return self;
 }
@@ -343,11 +342,18 @@ NSString *const TCJSRequireCacheKey = @"cache";
 }
 
 - (instancetype)initWithContentOfFile:(NSString *)filepath context:(JSContext *)context {
-    if (self = [self initWithContext:context]) {
-        _filename = filepath;
+    TCJSModuleLoader moduleLoader = [TCJSRequire registeredModuleLoadersInContext:context][filepath.pathExtension];
+    if (moduleLoader) {
+        return self = [self initWithContentOfFile:filepath loader:moduleLoader context:context];
+    } else {
+        return self = nil;
+    }
+}
 
-        TCJSModuleLoader moduleLoader = [TCJSRequire registeredModuleLoadersInContext:context][filepath.pathExtension];
-        if (!(_loaded = moduleLoader && moduleLoader(self, filepath, context) && context.exception == nil)) {
+- (instancetype)initWithContentOfFile:(NSString *)path loader:(TCJSModuleLoader)loader context:(JSContext *)context {
+    if (self = [self initWithContext:context]) {
+        _filename = path;
+        if (!(_loaded = loader(self, path, context) && context.exception == nil)) {
             return self = nil;
         }
     }
@@ -356,6 +362,7 @@ NSString *const TCJSRequireCacheKey = @"cache";
 
 - (void)dealloc {
     self.exports = nil;
+    self.require = nil;
 }
 
 #pragma mark - Property
@@ -378,6 +385,28 @@ NSString *const TCJSRequireCacheKey = @"cache";
             NSAssert(context, @"Can't get a JSContext");
             self.managedExports = [JSManagedValue managedValueWithValue:exports];
             [context.virtualMachine addManagedReference:self.managedExports withOwner:self];
+        }
+    }
+}
+
+- (JSValue *)require {
+    return self.managedRequire.value ?: [JSValue valueWithUndefinedInContext:[JSContext currentContext]];
+}
+
+- (void)setRequire:(JSValue *)require {
+    @synchronized(self) {
+        if (self.managedRequire && self.managedRequire.value) {
+            JSContext *context = self.managedRequire.value.context ?: [JSContext currentContext];
+            NSAssert(context, @"Can't get a JSContext");
+            [context.virtualMachine removeManagedReference:self.managedRequire withOwner:self];
+            self.managedRequire = nil;
+        }
+
+        if (require) {
+            JSContext *context = require.context ?: [JSContext currentContext];
+            NSAssert(context, @"Can't get a JSContext");
+            self.managedRequire = [JSManagedValue managedValueWithValue:require];
+            [context.virtualMachine addManagedReference:self.managedRequire withOwner:self];
         }
     }
 }

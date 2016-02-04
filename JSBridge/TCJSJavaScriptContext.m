@@ -47,7 +47,6 @@ TCJS_EXTERN void TCJSJavaScriptContextSetupContext(JSContext *context) {
 
     // Load extensions
     [TCJSModule loadExtensionForJSContext:context];
-    [TCJSRequire loadExtensionForJSContext:context];
     for (Class ExtClass in TCJSJavaScriptContextRegisteredExtensions()) {
         [ExtClass loadExtensionForJSContext:context];
     }

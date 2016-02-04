@@ -28,6 +28,7 @@ module.exports.twentyFive = tests2.squareAdd(3, 4);
 global.loadCount++;
 
 module.exports.requireFuncCmp = require === global.require;
+module.exports.moduleRequireFuncCmp = require === module.require;
 module.exports.resolveFuncCmp = require.resolve === global.require.resolve;
 module.exports.requireCacheCmp = require.cache === global.require.cache;
 module.exports.requireExtensionsCmp = require.extensions === global.require.extensions;
