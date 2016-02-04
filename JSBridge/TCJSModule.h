@@ -21,6 +21,8 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 #import <TCJSBridge/TCJSJavaScriptContext.h>
 
+// Ref: http://fredkschott.com/post/2014/06/require-and-the-module-system/
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class TCJSModule;
@@ -31,36 +33,42 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly, getter=isLoaded) BOOL loaded;
 @property (nonatomic, strong, readonly) NSMutableArray<NSString *> *paths;
 @property (nonatomic, nullable, readwrite) JSValue *exports;  // Delegate to JSManagedValue
-@property (nonatomic, nullable, readwrite) JSValue *pool;
-
-- (void)clearRequireCache;
-
-- (nullable NSString *)resolve:(NSString *)jsPath;
-- (nullable JSValue *)require:(NSString *)jsPath;
 
 @end
 
-@interface TCJSModule : NSObject <TCJSModule>
+typedef BOOL(^TCJSModuleLoader)(TCJSModule *module, NSString *filepath, JSContext *context);
 
-+ (void)registerGlobalModuleNamed:(NSString *)globalModuleName
-                        withBlock:(TCJSModule *_Nullable (^)(JSContext *context))block;
+@interface TCJSModule : NSObject <TCJSModule, TCJSJavaScriptContextExtension>
+
++ (void)registerGlobalModuleNamed:(NSString *)globalModuleName witBlock:(TCJSModule *(^)(JSContext *context))block;
 
 + (nullable TCJSModule *)mainModuleOfContext:(JSContext *)context;
 
-+ (instancetype)moduleWithExports:(id)exports;
-- (nullable instancetype)initWithContext:(JSContext *)context;
-- (nullable instancetype)initWithScriptContentsOfFile:(nullable NSString *)path context:(nullable JSContext *)context;
-- (nullable instancetype)initWithScriptContentsOfFile:(nullable NSString *)path
-                                            loadPaths:(nullable NSArray<NSString *> *)loadPaths
-                                              context:(nullable JSContext *)context;
-- (instancetype)initWithScript:(nullable NSString *)script
-                    sourceFile:(nullable NSString *)path
-                     loadPaths:(nullable NSArray<NSString *> *)loadPaths
-                       context:(nullable JSContext *)context
-                          pool:(nullable NSMutableDictionary *)pool NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithContext:(nullable JSContext *)context NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithExports:(JSValue *)exports context:(nullable JSContext *)context;
+- (nullable instancetype)initWithContentOfFile:(NSString *)filepath context:(nullable JSContext *)context;
 
-- (JSValue *)evaluateScript:(NSString *)script sourceURL:(nullable NSURL *)sourceURL context:(JSContext *)context;
-- (nullable TCJSModule *)moduleByRequiringPath:(NSString *)jsPath context:(JSContext *)context;
+@end
+
+@interface TCJSRequire : NSObject <TCJSJavaScriptContextExtension>
+
++ (JSValue *)globalRequireFunctionInContext:(JSContext *)context;
++ (JSValue *)createNewRequireFunctionForModule:(TCJSModule *)module context:(JSContext *)context;
+
++ (void)registerModuleLoader:(nullable TCJSModuleLoader)moduleLoader
+                forExtension:(NSString *)extension
+                     context:(JSContext *)context;
++ (NSDictionary<NSString *, TCJSModuleLoader> *)registeredModuleLoadersInContext:(JSContext *)context;
+
++ (NSDictionary<NSString *, TCJSModule *> *)loadedModulesInContext:(JSContext *)context;
+
++ (TCJSModule *)loadModuleByPath:(NSString *)jsPath
+                    parentModule:(nullable TCJSModule *)parentModule
+                         context:(JSContext *)context;
++ (nullable NSString *)resolve:(NSString *)jsPath
+                  parentModule:(nullable TCJSModule *)module
+                        loader:(TCJSModuleLoader _Nullable __autoreleasing *_Nullable)outLoader
+                       context:(JSContext *)context;
 
 @end
 

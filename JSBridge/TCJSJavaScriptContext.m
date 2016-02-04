@@ -19,6 +19,7 @@
 
 #import "TCJSJavaScriptContext.h"
 #import "TCJSModule.h"
+#import "TCJSUtils.h"
 #import <objc/runtime.h>
 
 TCJS_EXTERN NSMutableSet<Class> *TCJSJavaScriptContextRegisteredExtensions();
@@ -26,30 +27,33 @@ TCJS_EXTERN NSMutableSet<Class> *TCJSJavaScriptContextRegisteredExtensions();
 #pragma mark - Main
 
 TCJS_EXTERN void TCJSJavaScriptContextSetupContext(JSContext *context) {
-    context[@"global"] = context[@"root"] = context.globalObject;
-
-    // Global module
-    TCJSModule *module = [[TCJSModule alloc]
-                          initWithScript:nil
-                          sourceFile:nil
-                          loadPaths:@[[NSBundle mainBundle].bundlePath,
-                                      [NSBundle bundleForClass:TCJSModule.class].bundlePath]
-                          context:context
-                          pool:nil];
-    context[@"module"] = module;
-    context[@"require"] = ^JSValue *_Nullable(NSString *path){
-        TCJSModule *module = [[JSContext currentContext][@"module"] toObjectOfClass:[TCJSModule class]];
-        return [module require:path];
-    };
+    // shortcut of globals
+    [TCJSUtil defineProperty:@"global"
+                  enumerable:YES
+                configurable:NO
+                    writable:NO
+                       value:nil
+                      getter:^id _Nullable{ return [JSContext currentContext].globalObject; }
+                      setter:nil
+                    forValue:context.globalObject];
+    [TCJSUtil defineProperty:@"root"
+                  enumerable:YES
+                configurable:NO
+                    writable:NO
+                       value:nil
+                      getter:^id _Nullable{ return [JSContext currentContext].globalObject; }
+                      setter:nil
+                    forValue:context.globalObject];
 
     // Load extensions
+    [TCJSModule loadExtensionForJSContext:context];
+    [TCJSRequire loadExtensionForJSContext:context];
     for (Class ExtClass in TCJSJavaScriptContextRegisteredExtensions()) {
         [ExtClass loadExtensionForJSContext:context];
     }
 }
 
 TCJS_EXTERN void TCJSJavaScriptContextDeactivateContext(JSContext *context) {
-    context[@"global"] = context[@"root"] = [JSValue valueWithUndefinedInContext:context];
     for (Class ExtClass in TCJSJavaScriptContextRegisteredExtensions()) {
         if ([ExtClass respondsToSelector:@selector(deactivateExtensionForJSContext:)]) {
             [ExtClass deactivateExtensionForJSContext:context];

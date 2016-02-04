@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		436A21DBEFAFC696C99A41CB /* Pods_JSBridgeApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECBFCF66BD2F290391268890 /* Pods_JSBridgeApp.framework */; };
+		FE8EA97F1C63053F00D802FD /* RequireTestsA.js in Resources */ = {isa = PBXBuildFile; fileRef = FE8EA97E1C63053F00D802FD /* RequireTestsA.js */; };
+		FE8EA9811C63054800D802FD /* RequireTestsB.js in Resources */ = {isa = PBXBuildFile; fileRef = FE8EA9801C63054800D802FD /* RequireTestsB.js */; };
+		FE8EA9831C634D8800D802FD /* RequireTests.json in Resources */ = {isa = PBXBuildFile; fileRef = FE8EA9821C634D8800D802FD /* RequireTests.json */; };
 		FEB7EE471C59B1EC00B0D44E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE461C59B1EC00B0D44E /* AppDelegate.swift */; };
 		FEB7EE491C59B1EC00B0D44E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEB7EE481C59B1EC00B0D44E /* ViewController.swift */; };
 		FEB7EE4C1C59B1EC00B0D44E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FEB7EE4A1C59B1EC00B0D44E /* Main.storyboard */; };
@@ -44,6 +47,9 @@
 		80DBB854F41C746777EDD627 /* Pods-JSBridgeApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JSBridgeApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-JSBridgeApp/Pods-JSBridgeApp.debug.xcconfig"; sourceTree = "<group>"; };
 		ECBFCF66BD2F290391268890 /* Pods_JSBridgeApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_JSBridgeApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F72F638C287A0995903C93E0 /* Pods-JSBridgeApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JSBridgeApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-JSBridgeApp/Pods-JSBridgeApp.release.xcconfig"; sourceTree = "<group>"; };
+		FE8EA97E1C63053F00D802FD /* RequireTestsA.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = RequireTestsA.js; sourceTree = "<group>"; };
+		FE8EA9801C63054800D802FD /* RequireTestsB.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = RequireTestsB.js; sourceTree = "<group>"; };
+		FE8EA9821C634D8800D802FD /* RequireTests.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = RequireTests.json; sourceTree = "<group>"; };
 		FEB7EE431C59B1EC00B0D44E /* JSBridgeApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JSBridgeApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEB7EE461C59B1EC00B0D44E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FEB7EE481C59B1EC00B0D44E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -147,6 +153,9 @@
 				FEB7EE8F1C59C0B400B0D44E /* RequireTests.swift */,
 				FEB7EE911C59C16C00B0D44E /* RequireTests.js */,
 				FEB7EE931C59C17500B0D44E /* RequireTests2.js */,
+				FE8EA97E1C63053F00D802FD /* RequireTestsA.js */,
+				FE8EA9801C63054800D802FD /* RequireTestsB.js */,
+				FE8EA9821C634D8800D802FD /* RequireTests.json */,
 				FEB7EE961C59C35700B0D44E /* UtilsTests.swift */,
 				FEB7EEA01C59C96C00B0D44E /* ConsoleTests.swift */,
 				FEB7EEA21C59C9EA00B0D44E /* ApplicationTests.swift */,
@@ -266,7 +275,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FE8EA97F1C63053F00D802FD /* RequireTestsA.js in Resources */,
 				FEB7EE921C59C16C00B0D44E /* RequireTests.js in Resources */,
+				FE8EA9811C63054800D802FD /* RequireTestsB.js in Resources */,
+				FE8EA9831C634D8800D802FD /* RequireTests.json in Resources */,
 				FEB7EE941C59C17500B0D44E /* RequireTests2.js in Resources */,
 				FEB7EECC1C5BBB5500B0D44E /* jsbridge.txt in Resources */,
 			);

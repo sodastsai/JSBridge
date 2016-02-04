@@ -14,20 +14,9 @@
 //  limitations under the License.
 //
 
-var tests2 = require('RequireTests2.js');
-
-module.exports.answer = 42;
-
-var garbage = 43;
-global.overrided = 44;
-
-exports.name = "Tickle";
-
-module.exports.twentyFive = tests2.squareAdd(3, 4);
-
-global.loadCount++;
-
-module.exports.requireFuncCmp = require === global.require;
-module.exports.resolveFuncCmp = require.resolve === global.require.resolve;
-module.exports.requireCacheCmp = require.cache === global.require.cache;
-module.exports.requireExtensionsCmp = require.extensions === global.require.extensions;
+application.console.log("A: Start to load");
+module.exports.done = false;
+var b = require('./RequireTestsB.js');
+application.console.log("A: b.done = %j", b.done);
+module.exports.done = true;
+application.console.log("A: Finish to load");

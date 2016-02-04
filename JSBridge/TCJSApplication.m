@@ -58,7 +58,8 @@ NSString *const TCJSApplicationResignActiveJSEventName = @"resignActive";
 + (void)loadExtensionForJSContext:(JSContext *)context {
     TCJSModule *module = [[TCJSModule alloc] initWithContext:context];
 
-    JSValue *EventEmitter = [module moduleByRequiringPath:@"events" context:context].exports[@"EventEmitter"];
+    TCJSModule *eventsModule = [TCJSRequire loadModuleByPath:@"events" parentModule:module context:context];
+    JSValue *EventEmitter = eventsModule.exports[@"EventEmitter"];
     JSValue *application = [EventEmitter constructWithArguments:@[]];
 
     [TCJSUtil defineReadonlyProperty:@"_nativeObject"
@@ -169,6 +170,7 @@ NSString *const TCJSApplicationResignActiveJSEventName = @"resignActive";
 @property (nonatomic, readonly) NSString *version;
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSString *model;
+@property (nonatomic, readonly) NSString *bridgeVersion;
 
 #if DEBUG
 - (void)_garbageCollect;
@@ -213,6 +215,10 @@ NSString *const TCJSApplicationResignActiveJSEventName = @"resignActive";
 
 - (void)_garbageCollect {
     JSGarbageCollect([JSContext currentContext].JSGlobalContextRef);
+}
+
+- (NSString *)bridgeVersion {
+    return @"0.0.1";  // TODO: Integrate with build tool
 }
 
 @end

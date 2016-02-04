@@ -18,6 +18,7 @@
 //
 
 #import "TCJSModule.h"
+#import "TCJSUtils.h"
 #import <BenzeneFoundation/BenzeneFoundation.h>
 
 @interface TCJSModule ()
@@ -28,16 +29,256 @@
 @property (nonatomic, strong, readwrite) NSMutableArray<NSString *> *paths;
 
 @property (nonatomic, strong) JSManagedValue *managedExports;
-@property (nonatomic, strong) JSManagedValue *managedPool;
+
++ (NSMutableDictionary<NSString *, TCJSModule *(^)(JSContext *)> *)registeredGlobalModules;
 
 @end
 
-TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSString *modulePath) {
-    NSString *message = BFFormatString(@"Cannot find module '%@'", modulePath);
-    return [JSValue valueWithNewErrorFromMessage:message inContext:context];
+@interface TCJSRequire ()
+
++ (void)setModule:(nullable TCJSModule *)module asLoadedForPath:(NSString *)path context:(JSContext *)context;
+
+@end
+
+NSString *const TCJSRequireExtensionsKey = @"extensions";
+NSString *const TCJSRequireCacheKey = @"cache";
+
+@implementation TCJSRequire
+
++ (void)loadExtensionForJSContext:(JSContext *)context {
+    [self globalRequireFunctionInContext:context];
 }
 
++ (void)registerModuleLoader:(nullable TCJSModuleLoader)moduleLoader
+                forExtension:(NSString *)pathExtension
+                     context:(JSContext *)context {
+    JSValue *extension = [self globalRequireFunctionInContext:context][TCJSRequireExtensionsKey];
+    if (moduleLoader) {
+        extension[pathExtension] = moduleLoader;
+    } else {
+        [extension deleteProperty:pathExtension];
+    }
+}
+
++ (NSDictionary<NSString *, TCJSModuleLoader> *)registeredModuleLoadersInContext:(JSContext *)context {
+    return [self globalRequireFunctionInContext:context][TCJSRequireExtensionsKey].toDictionary;
+}
+
++ (void)setModule:(nullable TCJSModule *)module asLoadedForPath:(NSString *)path context:(JSContext *)context {
+    JSValue *cache = [self globalRequireFunctionInContext:context][TCJSRequireCacheKey];
+    if (module) {
+        cache[path] = module;
+    } else {
+        [cache deleteProperty:path];
+    }
+}
+
++ (NSDictionary<NSString *, TCJSModule *> *)loadedModulesInContext:(JSContext *)context {
+    return [self globalRequireFunctionInContext:context][TCJSRequireCacheKey].toDictionary;
+}
+
++ (nullable NSString *)resolve:(NSString *)jsPath
+                  parentModule:(nullable TCJSModule *)parentModule
+                        loader:(__autoreleasing TCJSModuleLoader  _Nullable *)outLoader
+                       context:(nonnull JSContext *)context {
+    parentModule = parentModule ?: [TCJSModule mainModuleOfContext:context];
+
+    // Check global
+    if (TCJSModule.registeredGlobalModules[jsPath]) {
+        return jsPath;
+    }
+
+    // Check local
+    TCJSModuleLoader moduleLoader = nil;
+    NSDictionary<NSString *, TCJSModuleLoader> *loaders = [self registeredModuleLoadersInContext:context];
+    NSArray<NSString *> *pathExtensions = [@[@""] arrayByAddingObjectsFromArray:loaders.allKeys];
+    for (NSString *basePath in parentModule.paths) {
+        for (NSString *pathExtension in pathExtensions) {
+            NSString *fullJSPath = [basePath stringByAppendingPathComponent:jsPath].stringByStandardizingPath;
+            if (pathExtension.length) {
+                fullJSPath = [fullJSPath stringByAppendingPathExtension:pathExtension];
+            }
+
+            if ([[NSFileManager defaultManager] fileExistsAtPath:fullJSPath] &&
+                [fullJSPath isSubpathOfPath:basePath] &&
+                (moduleLoader = loaders[fullJSPath.pathExtension])) {
+                if (outLoader) {
+                    *outLoader = moduleLoader;
+                }
+                return fullJSPath;
+            }
+        }
+    }
+
+    return nil;
+}
+
++ (TCJSModule *)loadModuleByPath:(NSString *)jsPath
+                    parentModule:(TCJSModule *)parentModule
+                         context:(JSContext *)context {
+    parentModule = parentModule ?: [TCJSModule mainModuleOfContext:context];
+
+    TCJSModuleLoader moduleLoader = nil;
+    NSString *fullJSPath = [self resolve:jsPath parentModule:parentModule loader:&moduleLoader context:context];
+    if (!fullJSPath) {
+        return nil;
+    }
+
+    TCJSModule *module = [self loadedModulesInContext:context][fullJSPath];
+    if (!module) {
+        if (moduleLoader) {
+            module = [[TCJSModule alloc] initWithContext:context];
+            if (!(module.loaded = moduleLoader(module, fullJSPath, context) && context.exception == nil)) {
+                module.filename = fullJSPath;
+                module = nil;
+            }
+        } else {
+            // No module loader ... is global module
+            module = TCJSModule.registeredGlobalModules[fullJSPath](context);
+        }
+    }
+    if (module) {
+        [self setModule:module asLoadedForPath:fullJSPath context:context];
+    }
+    return module;
+}
+
++ (JSValue *)globalRequireFunctionInContext:(JSContext *)context {
+    JSValue *require = context[@"require"];
+    if (!require || require.isUndefined) {
+        require = context[@"require"] = [self createNewRequireFunctionForModule:[TCJSModule mainModuleOfContext:context]
+                                                                        context:context];
+        [self registerDefaultModuleLoaderForContext:context];
+    }
+    return require;
+}
+
++ (void)registerDefaultModuleLoaderForContext:(JSContext *)context {
+    [self registerModuleLoader:^BOOL(TCJSModule *module, NSString *filepath, JSContext *context) {
+        NSError *error;
+        NSString *script = [[NSString alloc] initWithContentsOfFile:filepath
+                                                           encoding:NSUTF8StringEncoding
+                                                              error:&error];
+        if (script) {
+            @autoreleasepool {
+                NSURL *sourceURL = [NSURL fileURLWithPath:filepath];
+                NSString *paddedScript = [NSString stringWithFormat:
+                                          @"(function() {\n"
+                                          @"    return (function(exports, module, require, __filename, __dirname) {\n"
+                                          @"        /* --- Start of Script Body --- */\n"
+                                          @"%@\n"
+                                          @"        /* --- End of Script Body --- */\n"
+                                          @"    }).apply(arguments[0], arguments);\n"
+                                          @"});\n", script];
+                JSValue *scriptLoader = (sourceURL ?
+                                         [context evaluateScript:paddedScript withSourceURL:sourceURL] :
+                                         [context evaluateScript:paddedScript]);
+                return [scriptLoader callWithArguments:@[
+                    module.exports,
+                    module,
+                    [self createNewRequireFunctionForModule:module context:context],
+                    sourceURL.path,
+                    sourceURL.path.stringByDeletingLastPathComponent
+                ]];
+            }
+            return context.exception == nil;
+        } else {
+            context.exception = [JSValue valueWithNewErrorFromMessage:error.localizedDescription inContext:context];
+            return NO;
+        }
+    } forExtension:@"js" context:context];
+
+    [self registerModuleLoader:^BOOL(TCJSModule *module, NSString *filepath, JSContext *context) {
+        NSInputStream *inputStream = [[NSInputStream alloc] initWithFileAtPath:filepath];
+        [inputStream open];
+        @onExit {
+            [inputStream close];
+        };
+
+        NSString *errorMessage = nil;
+        id result = nil;
+        @try {
+            NSError *error;
+            result = [NSJSONSerialization JSONObjectWithStream:inputStream
+                                                       options:NSJSONReadingAllowFragments
+                                                         error:&error];
+            if (!result && error) {
+                errorMessage = error.localizedDescription;
+            }
+        }
+        @catch (NSException *exception) {
+            errorMessage = exception.reason;
+        }
+        @finally {
+            module.exports = (result ?
+                              [JSValue valueWithObject:result inContext:context] :
+                              [JSValue valueWithUndefinedInContext:context]);
+            if (errorMessage) {
+                context.exception = [JSValue valueWithNewErrorFromMessage:errorMessage inContext:context];
+            }
+            return result != nil && errorMessage == nil;
+        }
+    } forExtension:@"json" context:context];
+}
+
++ (JSValue *)createNewRequireFunctionForModule:(TCJSModule *)module context:(JSContext *)context {
+    BOOL globalModule = [[TCJSModule mainModuleOfContext:context] isEqual:module];
+
+    JSValue *require = [JSValue valueWithObject:^(NSString *jsPath){
+        return [TCJSRequire loadModuleByPath:jsPath parentModule:module context:[JSContext currentContext]].exports;
+    } inContext:context];
+    require[@"resolve"] = ^(NSString *jsPath) {
+        JSContext *context = [JSContext currentContext];
+        NSString *fullJSPath = [TCJSRequire resolve:jsPath parentModule:module loader:NULL context:context];
+        if (!fullJSPath) {
+            NSString *message = BFFormatString(@"Cannot find module '%@'", jsPath);
+            context.exception = [JSValue valueWithNewErrorFromMessage:message inContext:context];
+        }
+        return fullJSPath;
+    };
+
+    if (globalModule) {
+        require[TCJSRequireExtensionsKey] = [JSValue valueWithNewObjectInContext:context];
+        require[TCJSRequireCacheKey] = [JSValue valueWithNewObjectInContext:context];
+    } else {
+        [TCJSUtil defineProperty:TCJSRequireExtensionsKey
+                      enumerable:YES
+                    configurable:NO
+                        writable:NO
+                           value:nil
+                          getter:^id _Nullable{
+                              return [JSContext currentContext][@"require"][TCJSRequireExtensionsKey];
+                          }
+                          setter:nil
+                        forValue:require];
+        [TCJSUtil defineProperty:TCJSRequireCacheKey
+                      enumerable:YES
+                    configurable:NO
+                        writable:NO
+                           value:nil
+                          getter:^id _Nullable{
+                              return [JSContext currentContext][@"require"][TCJSRequireCacheKey];
+                          }
+                          setter:nil
+                        forValue:require];
+    }
+
+    return require;
+}
+
+@end
+
 @implementation TCJSModule
+
++ (void)loadExtensionForJSContext:(JSContext *)context {
+    TCJSModule *module = context[@"module"] = [[TCJSModule alloc] initWithContext:context];
+    NSString *classBundlePath = [NSBundle bundleForClass:TCJSModule.class].bundlePath;
+    [module.paths addObject:classBundlePath];
+    NSString *mainBundlePath = [NSBundle mainBundle].bundlePath;
+    if (![classBundlePath isEqualToString:mainBundlePath]) {
+        [module.paths addObject:mainBundlePath];
+    }
+}
 
 + (NSMutableDictionary<NSString *, TCJSModule *(^)(JSContext *)> *)registeredGlobalModules {
     static NSMutableDictionary *registeredGlobalModules;
@@ -48,8 +289,12 @@ TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSStr
     return registeredGlobalModules;
 }
 
-+ (void)registerGlobalModuleNamed:(NSString *)globalModuleName withBlock:(TCJSModule *(^)(JSContext *))block {
-    self.registeredGlobalModules[globalModuleName] = block;
++ (void)registerGlobalModuleNamed:(NSString *)globalModuleName witBlock:(nonnull TCJSModule *(^)(JSContext *))block {
+    if (block) {
+        self.registeredGlobalModules[globalModuleName] = block;
+    } else {
+        [self.registeredGlobalModules removeObjectForKey:globalModuleName];
+    }
 }
 
 + (instancetype)mainModuleOfContext:(JSContext *)context {
@@ -65,85 +310,45 @@ TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSStr
 
 #pragma mark - Object Lifecycle
 
-+ (void)load {
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(applicationDidReceiveMemoryWarning:)
-                                                 name:UIApplicationDidReceiveMemoryWarningNotification
-                                               object:[UIApplication sharedApplication]];
-}
-
-+ (instancetype)moduleWithExports:(JSValue *)exports {
-    TCJSModule *module = [[TCJSModule alloc] init];
-    module.exports = exports;
-    return module;
-}
-
-- (instancetype)initWithScriptContentsOfFile:(NSString *)path context:(nullable JSContext *)context {
-    return self = [self initWithScriptContentsOfFile:path loadPaths:nil context:context];
-}
-
-- (instancetype)initWithScriptContentsOfFile:(NSString *)path
-                                   loadPaths:(nullable NSArray<NSString *> *)loadPaths
-                                     context:(nullable JSContext *)context{
-    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        NSString *scriptContent = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
-        if (scriptContent) {
-            return self = [self initWithScript:scriptContent
-                                    sourceFile:path
-                                     loadPaths:loadPaths
-                                       context:context
-                                          pool:nil];
-        }
-    }
-    return self = nil;
-}
-
 - (instancetype)init {
-    return self = [self initWithScript:nil sourceFile:nil loadPaths:nil context:nil pool:nil];
+    return self = [self initWithContext:nil];
 }
 
-- (nullable instancetype)initWithContext:(JSContext *)context {
-    return self = [self initWithScript:nil sourceFile:nil loadPaths:nil context:context pool:nil];
-}
-
-- (instancetype)initWithScript:(NSString *)script
-                    sourceFile:(NSString *)path
-                     loadPaths:(nullable NSArray<NSString *> *)loadPaths
-                       context:(nullable JSContext *)context
-                          pool:(nullable NSMutableDictionary *)pool {
+- (instancetype)initWithContext:(nullable JSContext *)context {
     if (self = [super init]) {
-        // Set load paths if necessary
         context = context ?: [JSContext currentContext];
-        if (!loadPaths) {
-            TCJSModule *mainModule = [TCJSModule mainModuleOfContext:context];
-            if (mainModule) {
-                loadPaths = mainModule.paths;
-            } else {
-                loadPaths = @[];
-            }
-        }
-        NSAssert(context, @"Cann't find a JSContext");
+        NSAssert(context, @"Can't get a JSContext");
 
-        // Initialize
-        _paths = [loadPaths mutableCopy];
         _loaded = NO;
-        _filename = path;
         _moduleID = [NSString randomStringByLength:32];
 
-        self.exports = [JSValue valueWithNewObjectInContext:context];
-        self.pool = [JSValue valueWithNewObjectInContext:context];
-
-        // Load script
-        if (path) {
-            [_paths insertObject:path.stringByDeletingLastPathComponent atIndex:0];
-        }
-        if (script) {
-            [self evaluateScript:script sourceURL:path?[NSURL fileURLWithPath:path]:nil context:context];
-            if (!(_loaded = context.exception == nil)) {
-                return self = nil;
-            }
+        TCJSModule *mainModule = [TCJSModule mainModuleOfContext:context];
+        if (mainModule) {
+            _paths = [mainModule.paths mutableCopy];
         } else {
-            _loaded = YES;
+            _paths = [[NSMutableArray alloc] init];
+        }
+
+        self.exports = [JSValue valueWithNewObjectInContext:context];
+    }
+    return self;
+}
+
+- (instancetype)initWithExports:(id)exports context:(nullable JSContext *)context {
+    if (self = [self initWithContext:context]) {
+        self.exports = exports;
+        _loaded = YES;
+    }
+    return self;
+}
+
+- (instancetype)initWithContentOfFile:(NSString *)filepath context:(JSContext *)context {
+    if (self = [self initWithContext:context]) {
+        _filename = filepath;
+
+        TCJSModuleLoader moduleLoader = [TCJSRequire registeredModuleLoadersInContext:context][filepath.pathExtension];
+        if (!(_loaded = moduleLoader && moduleLoader(self, filepath, context) && context.exception == nil)) {
+            return self = nil;
         }
     }
     return self;
@@ -151,13 +356,6 @@ TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSStr
 
 - (void)dealloc {
     self.exports = nil;
-    [self.class.sharedRequireCache removeObjectForKey:self.moduleID];
-}
-
-#pragma mark - Notification
-
-+ (void)applicationDidReceiveMemoryWarning:(NSNotification *)notification {
-    [self.sharedRequireCache removeAllObjects];
 }
 
 #pragma mark - Property
@@ -181,131 +379,6 @@ TCJS_STATIC_INLINE JSValue *TCJSModuleCannotFindModule(JSContext *context, NSStr
             self.managedExports = [JSManagedValue managedValueWithValue:exports];
             [context.virtualMachine addManagedReference:self.managedExports withOwner:self];
         }
-    }
-}
-
-- (JSValue *)pool {
-    return self.managedPool.value ?: [JSValue valueWithUndefinedInContext:[JSContext currentContext]];
-}
-
-- (void)setPool:(JSValue *)pool {
-    @synchronized(self) {
-        if (self.managedPool && self.managedPool.value) {
-            JSContext *context = self.managedPool.value.context ?: [JSContext currentContext];
-            NSAssert(context, @"Can't get a JSContext");
-            [context.virtualMachine removeManagedReference:self.managedPool withOwner:self];
-            self.managedPool = nil;
-        }
-
-        if (pool) {
-            JSContext *context = pool.context ?: [JSContext currentContext];
-            NSAssert(context, @"Can't get a JSContext");
-            self.managedPool = [JSManagedValue managedValueWithValue:pool];
-            [context.virtualMachine addManagedReference:self.managedPool withOwner:self];
-        }
-    }
-}
-
-#pragma mark - Require Method
-
-+ (NSMutableDictionary<NSString *, NSCache<NSString *, TCJSModule *> *> *)sharedRequireCache {
-    static NSMutableDictionary *dictionary;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        dictionary = [NSMutableDictionary dictionary];
-    });
-    return dictionary;
-}
-
-- (NSCache<NSString *, TCJSModule *> *)requireCache {
-    NSCache<NSString *, TCJSModule *> *requiredCache = self.class.sharedRequireCache[self.moduleID];
-    if (!requiredCache) {
-        @synchronized(self) {
-            if (!requiredCache) {
-                requiredCache = self.class.sharedRequireCache[self.moduleID] = [[NSCache alloc] init];
-                requiredCache.countLimit = 10;
-            }
-        }
-    }
-    return requiredCache;
-}
-
-- (void)clearRequireCache {
-    [self.requireCache removeAllObjects];
-}
-
-- (nullable NSString *)resolve:(NSString *)jsPath {
-    NSString *fullJSPath = nil;
-    for (NSString *path in self.paths) {
-        fullJSPath = [path stringByAppendingPathComponent:jsPath].stringByStandardizingPath;
-        if ([fullJSPath isSubpathOfPath:path] &&
-            [[NSFileManager defaultManager] fileExistsAtPath:fullJSPath]) {
-            return fullJSPath;
-        } else {
-            fullJSPath = nil;
-        }
-    }
-
-    JSContext *context = [JSContext currentContext];
-    if (!fullJSPath && context) {
-        context.exception = TCJSModuleCannotFindModule(context, jsPath);
-    }
-
-    return nil;
-}
-
-- (nullable JSValue *)require:(NSString *)jsPath {
-    JSContext *context = [JSContext currentContext];
-    return [self moduleByRequiringPath:jsPath context:context].exports ?: [JSValue valueWithUndefinedInContext:context];
-}
-
-- (nullable TCJSModule *)moduleByRequiringPath:(NSString *)jsPath context:(JSContext *)context {
-    TCJSModule *module = [self.requireCache objectForKey:jsPath];
-    if (!module) {
-        TCJSModule *(^globalModuleLoader)(JSContext *) = self.class.registeredGlobalModules[jsPath];
-        if (globalModuleLoader) {
-            module = globalModuleLoader(context);
-            module.loaded = YES;
-        } else {
-            NSString *fullJSPath = [self resolve:jsPath];
-            if (fullJSPath) {
-                module = [[TCJSModule alloc] initWithScriptContentsOfFile:fullJSPath
-                                                                loadPaths:self.paths
-                                                                  context:context];
-            }
-        }
-
-        if (module) {
-            [self.requireCache setObject:module forKey:jsPath];
-        } else {
-            context.exception = TCJSModuleCannotFindModule(context, jsPath);
-        }
-    }
-
-    return module;
-}
-
-- (JSValue *)evaluateScript:(NSString *)script sourceURL:(nullable NSURL *)sourceURL context:(JSContext *)context {
-    @autoreleasepool {
-        NSString *paddedScript = [NSString stringWithFormat:
-                                  @"(function() {\n"
-                                  @"    return function(module) {\n"
-                                  @"        return (function _moduleContext() {  // `this` is `module`\n"
-                                  @"            function _require(path) {\n"
-                                  @"                return module.require(path);\n"
-                                  @"            }\n"
-                                  @"            return (function _body(module, exports, require) {\n"
-                                  @"                /* --- Start of Script Body --- */\n"
-                                  @"%@\n"
-                                  @"                /* --- End of Script Body --- */\n"
-                                  @"            }).call(this.exports, this, this.exports, _require);\n"
-                                  @"        }).call(module);\n"
-                                  @"    }\n"
-                                  @"})();\n", script];
-        JSValue *scriptLoader = (sourceURL ?
-                                 [context evaluateScript:paddedScript withSourceURL:sourceURL] :
-                                 [context evaluateScript:paddedScript]);
-        return [scriptLoader callWithArguments:@[self]];
     }
 }
 

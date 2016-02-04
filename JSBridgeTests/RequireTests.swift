@@ -41,25 +41,39 @@ class RequireTests: JSBridgeTests {
 
         XCTAssertTrue(globalObject.valueForProperty("garbage").isUndefined)
         globalObject.setValue(48, forProperty: "overrided")
-        globalObject.setValue(0, forProperty: "loadCount")
 
         self.context.evaluateScript("var test = require('RequireTests.js');")
         XCTAssertEqual(globalObject.valueForProperty("test").valueForProperty("answer").toNumber(), 42)
         XCTAssertEqual(globalObject.valueForProperty("test").valueForProperty("name").toString(), "Tickle")
         XCTAssertEqual(globalObject.valueForProperty("test").valueForProperty("twentyFive").toNumber(), 25)
-        XCTAssertEqual(globalObject.valueForProperty("loadCount").toNumber(), 1)
+
+        self.context.evaluateScript("var test2 = require('./RequireTests2');")
+        let squareAdd = globalObject.valueForProperty("test2").valueForProperty("squareAdd")
+        XCTAssertEqual(squareAdd.callWithArguments([5, 6]).toNumber(), 61)
 
         XCTAssertTrue(globalObject.valueForProperty("garbage").isUndefined)
         XCTAssertEqual(globalObject.valueForProperty("overrided").toNumber(), 44)
 
-        self.context.evaluateScript("var test2 = require('RequireTests.js');")
-        XCTAssertEqual(globalObject.valueForProperty("loadCount").toNumber(), 1)
+        XCTAssertFalse(globalObject.valueForProperty("test").valueForProperty("requireFuncCmp").toBool())
+        XCTAssertFalse(globalObject.valueForProperty("test").valueForProperty("resolveFuncCmp").toBool())
+        XCTAssertTrue(globalObject.valueForProperty("test").valueForProperty("requireCacheCmp").toBool())
+        XCTAssertTrue(globalObject.valueForProperty("test").valueForProperty("requireExtensionsCmp").toBool())
     }
 
     func testResolve() {
-        XCTAssertEqual(self.context.evaluateScript("module.resolve('RequireTests.js');").toString(),
+        var exceptionCaptured = false
+        self.context.exceptionHandler = { (context: JSContext!, exception: JSValue!) in
+            exceptionCaptured = true
+            XCTAssertEqual(exception.toString(), "Error: Cannot find module '11RequireTests.js'")
+            context.exception = nil
+        }
+        XCTAssertEqual(self.context.evaluateScript("require.resolve('RequireTests.js');").toString(),
             self.bundle.pathForResource("RequireTests", ofType: "js"))
-        XCTAssertTrue(self.context.evaluateScript("module.resolve('11RequireTests.js');").isUndefined)
+        XCTAssertEqual(self.context.evaluateScript("require.resolve('RequireTests.json');").toString(),
+            self.bundle.pathForResource("RequireTests", ofType: "json"))
+        XCTAssertEqual(self.context.evaluateScript("require.resolve('util');").toString(), "util")
+        XCTAssertTrue(self.context.evaluateScript("require.resolve('11RequireTests.js');").isUndefined)
+        XCTAssertTrue(exceptionCaptured)
     }
 
     func testClearRequireCache() {
@@ -71,9 +85,14 @@ class RequireTests: JSBridgeTests {
         self.context.evaluateScript("var test2 = require('RequireTests.js');")
         XCTAssertEqual(globalObject.valueForProperty("loadCount").toNumber(), 1)
 
-        self.context.evaluateScript("module.clearRequireCache();")
+        self.context.evaluateScript("delete require.cache[require.resolve('RequireTests.js')];")
 
         self.context.evaluateScript("var test3 = require('RequireTests.js');")
         XCTAssertEqual(globalObject.valueForProperty("loadCount").toNumber(), 2)
+    }
+
+    func testRequireJSON() {
+        self.context.evaluateScript("var test = require('RequireTests.json');")
+        XCTAssertEqual(self.context.globalObject.valueForProperty("test").valueForProperty("answer").toNumber(), 42)
     }
 }

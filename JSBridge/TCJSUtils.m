@@ -24,7 +24,7 @@
 @implementation TCJSUtil
 
 + (void)load {
-    [TCJSModule registerGlobalModuleNamed:@"util" withBlock:^TCJSModule *(JSContext *context) {
+    [TCJSModule registerGlobalModuleNamed:@"util" witBlock:^TCJSModule * _Nonnull(JSContext * _Nonnull context) {
         TCJSModule *module = [[TCJSModule alloc] initWithContext:context];
         module.exports[@"toString"] = ^(JSValue *obj) {
             return [TCJSUtil toString:obj context:[JSContext currentContext]];
@@ -403,7 +403,8 @@
 }
 
 - (JSValue *)buildWithModule:(TCJSModule *)module context:(JSContext *)context {
-    return [module evaluateScript:[NSString stringWithFormat:@"return %@;", self.script] sourceURL:nil context:context];
+    return nil;
+//    return [module evaluateScript:[NSString stringWithFormat:@"return %@;", self.script] sourceURL:nil context:context];
 }
 
 @end

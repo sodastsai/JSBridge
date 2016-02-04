@@ -5,16 +5,15 @@ declare const root: any;  // Alias of root object
 // Module --------------------------------------------------------------------------------------------------------------
 interface IRequireFunc {
     (path: string): any;
+    cache: any;
+    extensions: any;
+    resolve(path: string): string;
 }
 interface IModule { // Current module object
     filename: string;  // Readonly, file name of current script. Use this as __filename and __dirname in node.
     loaded: boolean;  // Readonly, indicating whether the script content is loaded of not
     exports: any;  // Exports symbols
     paths: [string];  // Readonly, search paths. The `require` function would find scripts under these paths
-    require: IRequireFunc;  // Import/Load other scripts in.
-    resolve(path: string): string;
-    pool: any;
-    clearRequireCache();
 }
 declare const module: IModule;
 declare const require: IRequireFunc;  // Import/Load other scripts in.
