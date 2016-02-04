@@ -149,6 +149,10 @@ NSString *const TCJSRequireCacheKey = @"cache";
 
 + (void)registerDefaultModuleLoaderForContext:(JSContext *)context {
     [self registerModuleLoader:^BOOL(TCJSModule *module, NSString *filepath, JSContext *context) {
+        if (!context) {
+            return NO;
+        }
+
         NSError *error;
         NSString *script = [[NSString alloc] initWithContentsOfFile:filepath
                                                            encoding:NSUTF8StringEncoding
@@ -183,6 +187,10 @@ NSString *const TCJSRequireCacheKey = @"cache";
     } forExtension:@"js" context:context];
 
     [self registerModuleLoader:^BOOL(TCJSModule *module, NSString *filepath, JSContext *context) {
+        if (!context) {
+            return NO;
+        }
+
         NSInputStream *inputStream = [[NSInputStream alloc] initWithFileAtPath:filepath];
         [inputStream open];
         @onExit {
