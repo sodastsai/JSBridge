@@ -295,7 +295,7 @@ NSString *const TCJSRequireCacheKey = @"cache";
     return registeredGlobalModules;
 }
 
-+ (void)registerGlobalModuleNamed:(NSString *)globalModuleName witBlock:(nonnull TCJSModule *(^)(JSContext *))block {
++ (void)registerGlobalModuleNamed:(NSString *)globalModuleName withBlock:(nonnull TCJSModule *(^)(JSContext *))block {
     if (block) {
         self.registeredGlobalModules[globalModuleName] = block;
     } else {

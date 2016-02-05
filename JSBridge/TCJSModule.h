@@ -41,7 +41,7 @@ typedef BOOL(^TCJSModuleLoader)(TCJSModule *module, NSString *filepath, JSContex
 
 @interface TCJSModule : NSObject <TCJSModule, TCJSJavaScriptContextExtension>
 
-+ (void)registerGlobalModuleNamed:(NSString *)globalModuleName witBlock:(TCJSModule *(^)(JSContext *context))block;
++ (void)registerGlobalModuleNamed:(NSString *)globalModuleName withBlock:(TCJSModule *(^)(JSContext *context))block;
 
 + (nullable TCJSModule *)mainModuleOfContext:(JSContext *)context;
 

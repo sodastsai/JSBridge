@@ -44,7 +44,7 @@ static char TCJSNotificationHandlerObserverHandlerAssociationKey;
 @implementation TCJSEvents
 
 + (void)load {
-    [TCJSModule registerGlobalModuleNamed:@"events" witBlock:^TCJSModule * _Nonnull(JSContext * _Nonnull context) {
+    [TCJSModule registerGlobalModuleNamed:@"events" withBlock:^TCJSModule * _Nonnull(JSContext * _Nonnull context) {
         NSString *jsPath = [[NSBundle bundleForClass:TCJSEvents.class] pathForResource:@"TCJSEvents" ofType:@"js"];
         TCJSModule *module = [[TCJSModule alloc] initWithContentOfFile:jsPath context:context];
         module.exports[@"EventCenter"] = [TCJSNotificationHandler class];

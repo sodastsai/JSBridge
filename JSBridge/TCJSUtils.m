@@ -24,7 +24,7 @@
 @implementation TCJSUtil
 
 + (void)load {
-    [TCJSModule registerGlobalModuleNamed:@"util" witBlock:^TCJSModule * _Nonnull(JSContext * _Nonnull context) {
+    [TCJSModule registerGlobalModuleNamed:@"util" withBlock:^TCJSModule * _Nonnull(JSContext * _Nonnull context) {
         TCJSModule *module = [[TCJSModule alloc] initWithContext:context];
         module.exports[@"toString"] = ^(JSValue *obj) {
             return [TCJSUtil toString:obj context:[JSContext currentContext]];

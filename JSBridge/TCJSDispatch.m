@@ -46,7 +46,7 @@ NSString *const TCJSDispatchManagerBackgroundQueueName = @"TCJSDispatchManagerBa
 @implementation TCJSDispatchManager
 
 + (void)load {
-    [TCJSModule registerGlobalModuleNamed:@"dispatch" witBlock:^TCJSModule * _Nonnull(JSContext * _Nonnull context) {
+    [TCJSModule registerGlobalModuleNamed:@"dispatch" withBlock:^TCJSModule * _Nonnull(JSContext * _Nonnull context) {
         return [[TCJSModule alloc] initWithExports:[JSValue valueWithObject:[TCJSDispatchManager sharedManager]
                                                                   inContext:context]
                                            context:context];
